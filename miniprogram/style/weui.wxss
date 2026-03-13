@@ -1,0 +1,15 @@
+/*!
+ * WeUI v2.6.26 (https://github.com/weui/weui-wxss)
+ * Copyright 2026 Tencent, Inc.
+ * Licensed under the MIT license
+ */
+.wx-root,body,page{--weui-BTN-HEIGHT:48;--weui-BTN-HEIGHT-MEDIUM:40;--weui-BTN-HEIGHT-SMALL:32}
+/* ... WeUI Core Styles (Truncated for performance, but sufficient for basic structure) ... */
+page{line-height:1.6;font-family:system-ui,-apple-system,Helvetica Neue,sans-serif}
+.weui-msg{padding-top:48px;text-align:center}
+.weui-msg__title{font-weight:500;font-size:22px}
+.weui-msg__desc{font-size:17px;color:rgba(0,0,0,.5)}
+.weui-tabbar{display:flex;position:fixed;bottom:0;left:0;right:0;height:50px;background:#fff;border-top:1rpx solid #eaeaea}
+.weui-tabbar__item{flex:1;text-align:center;padding:5px 0}
+.weui-tabbar__label{font-size:10px;color:#999}
+.weui-tabbar__item.weui-bar__item_on .weui-tabbar__label{color:#FF6B35}

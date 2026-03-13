@@ -1,0 +1,272 @@
+page {
+  background-color: #F7F7F7;
+}
+
+.page {
+  min-height: 100%;
+  width: 100%;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* ===== 沉浸式头部 ===== */
+.mine-header {
+  background: linear-gradient(180deg, #FF6B35 0%, #E8521A 100%);
+  padding: 0 40rpx 140rpx;
+  box-sizing: border-box;
+}
+
+/* headerRow 内部标题 */
+.header-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-title {
+  color: #FFFFFF;
+  font-size: 34rpx;
+  font-weight: 600;
+}
+
+/* 用户信息行 */
+.user-info-box {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding-top: 20rpx;
+  padding-bottom: 16rpx;
+}
+
+.avatar-container {
+  width: 136rpx;
+  height: 136rpx;
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.avatar-circle {
+  width: 116rpx;
+  height: 116rpx;
+  background-color: #EEEEEE;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.avatar-icon {
+  width: 48rpx;
+  height: 48rpx;
+}
+
+.user-detail-info {
+  margin-left: 32rpx;
+  flex: 1;
+}
+
+.nickname {
+  color: #FFFFFF;
+  font-size: 40rpx;
+  font-weight: bold;
+  margin-bottom: 10rpx;
+}
+
+.level-label {
+  display: inline-block;
+  font-size: 24rpx;
+  color: #FFFFFF;
+  background-color: rgba(255, 255, 255, 0.2);
+  padding: 6rpx 24rpx;
+  border-radius: 24rpx;
+}
+
+.nav-arrow-icon {
+  width: 32rpx;
+  height: 32rpx;
+  opacity: 0.8;
+  flex-shrink: 0;
+}
+
+/* ===== 主体内容容器 ===== */
+.mine-container {
+  padding: 0 32rpx;
+  margin-top: -100rpx; /* 卡片向上叠入 banner */
+  position: relative;
+  z-index: 10;
+  padding-bottom: 60rpx;
+}
+
+/* ===== 资产卡片 ===== */
+.asset-card {
+  background-color: #FFFFFF;
+  border-radius: 28rpx;
+  padding: 48rpx 0;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 4rpx 24rpx rgba(0, 0, 0, 0.08);
+  margin-bottom: 24rpx;
+}
+
+.asset-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.asset-v-line {
+  width: 2rpx;
+  height: 70rpx;
+  background-color: #F0F0F0;
+}
+
+.asset-label {
+  font-size: 24rpx;
+  color: #999999;
+  margin-bottom: 14rpx;
+}
+
+.asset-number {
+  font-size: 52rpx;
+  font-weight: bold;
+  color: #1A1A1A;
+}
+
+.asset-number.highlight {
+  color: #FF6B35;
+}
+
+/* ===== 视频号店卡片 ===== */
+.shop-entry-card {
+  background: linear-gradient(90deg, #FF6B35 0%, #E8521A 100%);
+  border-radius: 28rpx;
+  padding: 28rpx 32rpx;
+  display: flex;
+  align-items: center;
+  margin-bottom: 24rpx;
+  box-shadow: 0 8rpx 24rpx rgba(255, 107, 53, 0.25);
+}
+
+.shop-icon-wrap {
+  width: 72rpx;
+  height: 72rpx;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 16rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 24rpx;
+  flex-shrink: 0;
+}
+
+.shop-icon-img {
+  width: 36rpx;
+  height: 36rpx;
+}
+
+.shop-body {
+  flex: 1;
+}
+
+.shop-title {
+  color: #FFFFFF;
+  font-size: 30rpx;
+  font-weight: bold;
+  margin-bottom: 4rpx;
+}
+
+.shop-subtitle {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 22rpx;
+}
+
+.shop-btn-go {
+  background-color: #FFFFFF;
+  color: #FF6B35;
+  font-size: 24rpx;
+  font-weight: bold;
+  padding: 12rpx 28rpx;
+  border-radius: 40rpx;
+  flex-shrink: 0;
+}
+
+/* ===== 邀请好友卡片 ===== */
+.invite-entry-card {
+  background-color: #FFFFFF;
+  border-radius: 28rpx;
+  padding: 32rpx;
+  display: flex;
+  align-items: center;
+  margin-bottom: 24rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
+}
+
+/* ===== 菜单组 ===== */
+.menu-group {
+  background-color: #FFFFFF;
+  border-radius: 28rpx;
+  overflow: hidden;
+  margin-bottom: 40rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
+}
+
+.menu-row {
+  display: flex;
+  align-items: center;
+  padding: 32rpx;
+  border-bottom: 1rpx solid #F5F5F5;
+}
+
+.menu-row:last-child {
+  border-bottom: none;
+}
+
+.menu-icon-box {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 28rpx;
+  flex-shrink: 0;
+}
+
+.menu-icon-img {
+  width: 32rpx;
+  height: 32rpx;
+}
+
+.menu-main {
+  flex: 1;
+}
+
+.menu-title-text {
+  font-size: 30rpx;
+  color: #1A1A1A;
+  font-weight: 600;
+  margin-bottom: 4rpx;
+}
+
+.menu-desc-text {
+  font-size: 24rpx;
+  color: #999999;
+}
+
+.menu-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.menu-arrow-icon {
+  width: 28rpx;
+  height: 28rpx;
+}

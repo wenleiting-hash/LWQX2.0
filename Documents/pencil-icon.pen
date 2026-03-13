@@ -1,0 +1,177 @@
+{
+  "version": "2.8",
+  "children": [
+    {
+      "type": "frame",
+      "id": "bi8Au",
+      "x": 0,
+      "y": 0,
+      "name": "Frame",
+      "clip": true,
+      "width": 800,
+      "height": 600,
+      "fill": "#FFFFFF",
+      "layout": "none"
+    },
+    {
+      "type": "frame",
+      "id": "TtsSf",
+      "x": 0,
+      "y": 0,
+      "name": "search",
+      "width": 81,
+      "height": 81,
+      "children": [
+        {
+          "type": "icon_font",
+          "id": "vPtni",
+          "width": 60,
+          "height": 60,
+          "iconFontName": "search",
+          "iconFontFamily": "Material Symbols Rounded",
+          "fill": "#999999"
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "PgAlu",
+      "x": 100,
+      "y": 0,
+      "name": "search_active",
+      "width": 81,
+      "height": 81,
+      "children": [
+        {
+          "type": "icon_font",
+          "id": "5jFt3",
+          "width": 60,
+          "height": 60,
+          "iconFontName": "search",
+          "iconFontFamily": "Material Symbols Rounded",
+          "fill": "#FF6B35"
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "NVGD9",
+      "x": 0,
+      "y": 100,
+      "name": "discover",
+      "width": 81,
+      "height": 81,
+      "children": [
+        {
+          "type": "icon_font",
+          "id": "0X7Vh",
+          "width": 60,
+          "height": 60,
+          "iconFontName": "explore",
+          "iconFontFamily": "Material Symbols Rounded",
+          "fill": "#999999"
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "CauAH",
+      "x": 100,
+      "y": 100,
+      "name": "discover_active",
+      "width": 81,
+      "height": 81,
+      "children": [
+        {
+          "type": "icon_font",
+          "id": "a7tFn",
+          "width": 60,
+          "height": 60,
+          "iconFontName": "explore",
+          "iconFontFamily": "Material Symbols Rounded",
+          "fill": "#FF6B35"
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "31kfK",
+      "x": 0,
+      "y": 200,
+      "name": "order",
+      "width": 81,
+      "height": 81,
+      "children": [
+        {
+          "type": "icon_font",
+          "id": "b3ic5",
+          "width": 60,
+          "height": 60,
+          "iconFontName": "assignment",
+          "iconFontFamily": "Material Symbols Rounded",
+          "fill": "#999999"
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "iYnUR",
+      "x": 100,
+      "y": 200,
+      "name": "order_active",
+      "width": 81,
+      "height": 81,
+      "children": [
+        {
+          "type": "icon_font",
+          "id": "AJzuu",
+          "width": 60,
+          "height": 60,
+          "iconFontName": "assignment",
+          "iconFontFamily": "Material Symbols Rounded",
+          "fill": "#FF6B35"
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "sGGMF",
+      "x": 0,
+      "y": 300,
+      "name": "mine",
+      "width": 81,
+      "height": 81,
+      "children": [
+        {
+          "type": "icon_font",
+          "id": "9fUUE",
+          "width": 60,
+          "height": 60,
+          "iconFontName": "person",
+          "iconFontFamily": "Material Symbols Rounded",
+          "fill": "#999999"
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "LJirr",
+      "x": 100,
+      "y": 300,
+      "name": "mine_active",
+      "width": 81,
+      "height": 81,
+      "children": [
+        {
+          "type": "icon_font",
+          "id": "5iZ0W",
+          "width": 60,
+          "height": 60,
+          "iconFontName": "person",
+          "iconFontFamily": "Material Symbols Rounded",
+          "fill": "#FF6B35"
+        }
+      ]
+    }
+  ]
+}

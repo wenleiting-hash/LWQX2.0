@@ -1,0 +1,13 @@
+{
+  "name": "parse_and_convert",
+  "version": "2.0.0",
+  "description": "老温轻省 - 核心查券转链与资产清洗引擎",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3",
+    "axios": "^1.6.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

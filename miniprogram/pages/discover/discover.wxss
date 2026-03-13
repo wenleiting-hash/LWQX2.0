@@ -1,0 +1,138 @@
+page {
+  background-color: #F5F5F5;
+  height: 100%;
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* NavBar */
+.nav-container {
+  background-color: #FFFFFF;
+}
+
+.nav-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-bar-title {
+  font-size: 34rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+}
+
+/* Tabs */
+.tabs-container {
+  display: flex;
+  background-color: #FFFFFF;
+  padding: 0 32rpx;
+  height: 88rpx;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 48rpx;
+  border-bottom: 1rpx solid #F0F0F0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.tab-item {
+  position: relative;
+  height: 88rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tab-text {
+  font-size: 30rpx;
+  color: #7A7E83;
+}
+
+.tab-item.active .tab-text {
+  color: #FF6B35;
+  font-weight: 600;
+}
+
+.tab-indicator {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 70%;
+  height: 6rpx;
+  background-color: #FF6B35;
+  border-radius: 3rpx;
+}
+
+/* 瀑布流布局 */
+.goods-scroll {
+  flex: 1;
+}
+
+.waterfall {
+  display: flex;
+  padding: 24rpx;
+  gap: 20rpx;
+}
+
+.column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.goods-card {
+  background-color: #FFFFFF;
+  border-radius: 16rpx;
+  overflow: hidden;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05);
+}
+
+.goods-img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.goods-info {
+  padding: 20rpx;
+}
+
+.goods-title {
+  font-size: 28rpx;
+  color: #333333;
+  line-height: 1.4;
+  margin-bottom: 16rpx;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+.goods-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.goods-price {
+  font-size: 36rpx;
+  color: #FF6B35;
+  font-weight: bold;
+}
+
+.goods-points {
+  font-size: 22rpx;
+  color: #FF6B35;
+  background-color: #FFF0E8;
+  padding: 4rpx 12rpx;
+  border-radius: 4rpx;
+  align-self: flex-start;
+}

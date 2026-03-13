@@ -1,0 +1,89 @@
+<scroll-view scroll-y class="page" enhanced show-scrollbar="{{false}}">
+  <!-- 沉浸式头部 Banner：撑开状态栏+导航区，直接展示用户信息 -->
+  <view
+    class="mine-header"
+    style="padding-top: {{statusBarHeight + navBarPad}}px;"
+  >
+    <!-- headerRow：NavBar 内容区 -->
+    <view class="header-row" style="height: {{navHeight}}px;">
+      <text class="nav-title">个人中心</text>
+    </view>
+
+    <!-- 用户信息行 -->
+    <view class="user-info-box">
+      <view class="avatar-container">
+        <view class="avatar-circle">
+          <image class="avatar-icon" src="/images/icons/avatar_user.png" mode="aspectFit"></image>
+        </view>
+      </view>
+      <view class="user-detail-info">
+        <view class="nickname">{{userInfo.nickName}}</view>
+        <view class="level-label">{{userInfo.level}}</view>
+      </view>
+      <image class="nav-arrow-icon" src="/images/icons/chevron_right_white.png" mode="aspectFit"></image>
+    </view>
+  </view>
+
+  <view class="mine-container">
+    <!-- 资产统计卡片 -->
+    <view class="asset-card">
+      <view class="asset-column">
+        <text class="asset-label">累计为您省下（元）</text>
+        <text class="asset-number highlight">{{userInfo.totalSaved}}</text>
+      </view>
+      <view class="asset-v-line"></view>
+      <view class="asset-column">
+        <text class="asset-label">当前可用积分</text>
+        <text class="asset-number">{{userInfo.availablePoints}}</text>
+      </view>
+    </view>
+
+    <!-- 视频号店权益卡片 -->
+    <view class="shop-entry-card" bindtap="onMenuClick" data-id="shop">
+      <view class="shop-icon-wrap">
+        <image class="shop-icon-img" src="/images/icons/store.png" mode="aspectFit"></image>
+      </view>
+      <view class="shop-body">
+        <view class="shop-title">{{shopInfo.title}}</view>
+        <view class="shop-subtitle">{{shopInfo.desc}}</view>
+      </view>
+      <view class="shop-btn-go">去兑换</view>
+    </view>
+
+    <!-- 邀请好友卡片（独立） -->
+    <view class="invite-entry-card" bindtap="onMenuClick" data-id="invite">
+      <view class="menu-icon-box" style="background-color: {{inviteCard.bg}};">
+        <image class="menu-icon-img" src="{{inviteCard.iconPath}}" mode="aspectFit"></image>
+      </view>
+      <view class="menu-main">
+        <view class="menu-title-text">{{inviteCard.title}}</view>
+        <view class="menu-desc-text">{{inviteCard.desc}}</view>
+      </view>
+      <view class="menu-arrow">
+        <image class="menu-arrow-icon" src="/images/icons/chevron_right_grey.png" mode="aspectFit"></image>
+      </view>
+    </view>
+
+    <!-- 功能菜单列表 -->
+    <view class="menu-group">
+      <view
+        class="menu-row"
+        wx:for="{{menuList}}"
+        wx:key="id"
+        bindtap="onMenuClick"
+        data-id="{{item.id}}"
+      >
+        <view class="menu-icon-box" style="background-color: {{item.bg}};">
+          <image class="menu-icon-img" src="{{item.iconPath}}" mode="aspectFit"></image>
+        </view>
+        <view class="menu-main">
+          <view class="menu-title-text">{{item.title}}</view>
+          <view class="menu-desc-text">{{item.desc}}</view>
+        </view>
+        <view class="menu-arrow">
+          <image class="menu-arrow-icon" src="/images/icons/chevron_right_grey.png" mode="aspectFit"></image>
+        </view>
+      </view>
+    </view>
+  </view>
+</scroll-view>

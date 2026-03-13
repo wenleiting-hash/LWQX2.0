@@ -1,0 +1,103 @@
+<view class="page" data-weui-theme="{{theme}}">
+  <!-- NavBar -->
+  <view class="nav-container" style="padding-top: {{statusBarHeight}}px;">
+    <view class="nav-bar" style="height: {{navHeight}}px;">
+      <text class="nav-bar-title">极省惠选</text>
+    </view>
+  </view>
+  <!-- 顶置搜索栏区 -->
+  <view class="header-section">
+    <view class="search-wrap">
+      <view class="search-bar">
+        <image class="search-icon" src="/images/icons/search_grey.png" mode="aspectFit"></image>
+        <input class="search-input" placeholder="粘贴商品链接，自动识别优惠" placeholder-style="color: #B2B2B2;" bindinput="onInputChange" value="{{searchQuery}}" confirm-type="search" bindconfirm="onSearch" />
+      </view>
+    </view>
+  </view>
+
+  <scroll-view scroll-y class="page__bd" enhanced show-scrollbar="{{false}}">
+    <!-- 核心引导区 -->
+    <view class="guide-hero">
+      <view class="guide-icon-box">
+        <image class="guide-icon-img" src="/images/icons/clipboard_paste.png" mode="aspectFit"></image>
+      </view>
+      <view class="guide-main-title">复制链接，自动查优惠</view>
+      <view class="guide-tips">
+        <view>去淘宝/京东/拼多多 复制商品链接</view>
+        <view>打开小程序即可自动识别并显示隐藏优惠</view>
+      </view>
+    </view>
+
+    <!-- 3步省钱攻略 -->
+    <view class="strategy-section">
+      <view class="section-hd">3步省钱攻略</view>
+      
+      <view class="strategy-card">
+        <view class="step-badge">1</view>
+        <view class="step-text">打开淘宝/京东/拼多多，找到心仪商品</view>
+      </view>
+
+      <view class="strategy-card">
+        <view class="step-badge">2</view>
+        <view class="step-text">点击「分享」复制商品链接或口令</view>
+      </view>
+
+      <view class="strategy-card">
+        <view class="step-badge">3</view>
+        <view class="step-text">回到本小程序，自动弹出优惠信息</view>
+      </view>
+    </view>
+  </scroll-view>
+
+  <!-- 结果弹窗 ( WeUI 样式对齐 TnxsS.png ) -->
+  <view class="fadeIn" wx:if="{{showResult}}">
+    <view class="weui-mask" bindtap="closeResult"></view>
+    <view class="weui-half-screen-dialog">
+      <view class="weui-half-screen-dialog__hd">
+        <view class="weui-half-screen-dialog__hd__main">
+          <text class="weui-half-screen-dialog__title">检测到商品链接</text>
+        </view>
+        <view class="weui-half-screen-dialog__hd__side" bindtap="closeResult">
+          <view class="weui-icon-btn">
+            <image class="popup-close-icon" src="/images/icons/close_x.png" mode="aspectFit"></image>
+          </view>
+        </view>
+      </view>
+      <view class="weui-half-screen-dialog__bd">
+        <view class="result-card">
+          <image class="result-card__img" src="{{result.img}}" mode="aspectFill"></image>
+          <view class="result-card__info">
+            <view class="result-card__title">{{result.title}}</view>
+            <view class="result-card__price">
+              <text class="price-symbol">¥</text>
+              <text class="price-val">{{result.couponPrice}}</text>
+              <text class="price-origin">¥{{result.originPrice}}</text>
+            </view>
+            <view class="result-card__tags">
+              <view class="tag-save">为您省下 ¥{{result.originPrice - result.couponPrice}}</view>
+              <view class="tag-points">预估积分: {{result.points}}</view>
+            </view>
+          </view>
+        </view>
+      </view>
+      <view class="weui-half-screen-dialog__ft">
+        <button class="buy-btn" bindtap="gotoBuy">
+          立即领券
+        </button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 粘贴板提示弹窗 -->
+  <view class="clipboard-dialog" wx:if="{{showClipboardPopup}}">
+    <view class="weui-mask"></view>
+    <view class="weui-dialog">
+      <view class="weui-dialog__hd"><strong class="weui-dialog__title">检测到待解析链接</strong></view>
+      <view class="weui-dialog__bd">检测到来自粘贴板的商品信息，是否立即查询？</view>
+      <view class="weui-dialog__ft">
+        <view class="weui-dialog__btn weui-dialog__btn_default" bindtap="cancelClipboard">取消</view>
+        <view class="weui-dialog__btn weui-dialog__btn_primary" style="color: #FF6B35;" bindtap="confirmClipboard">立即查询</view>
+      </view>
+    </view>
+  </view>
+</view>

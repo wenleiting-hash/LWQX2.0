@@ -1,0 +1,67 @@
+<view class="page">
+  <!-- NavBar -->
+  <view class="nav-container" style="padding-top: {{statusBarHeight}}px;">
+    <view class="nav-bar" style="height: {{navHeight}}px;">
+      <text class="nav-bar-title">发现好物</text>
+    </view>
+  </view>
+
+  <!-- 顶置 Tabs -->
+  <view class="tabs-container">
+    <view
+      wx:for="{{tabs}}"
+      wx:key="id"
+      class="tab-item {{activeTab === item.id ? 'active' : ''}}"
+      bindtap="onTabClick"
+      data-id="{{item.id}}"
+    >
+      <text class="tab-text">{{item.title}}</text>
+      <view class="tab-indicator" wx:if="{{activeTab === item.id}}"></view>
+    </view>
+  </view>
+
+  <!-- 商品瀑布流列表 -->
+  <scroll-view scroll-y class="goods-scroll">
+    <view class="waterfall">
+      <!-- 左列 -->
+      <view class="column">
+        <view
+          class="goods-card"
+          wx:for="{{leftList}}"
+          wx:key="id"
+          bindtap="onGoodsClick"
+          data-id="{{item.id}}"
+        >
+          <image class="goods-img" src="{{item.image}}" mode="widthFix"></image>
+          <view class="goods-info">
+            <view class="goods-title">{{item.title}}</view>
+            <view class="goods-footer">
+              <view class="goods-price">¥{{item.price}}</view>
+              <view class="goods-points">约得 {{item.points}} 积分</view>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 右列 -->
+      <view class="column">
+        <view
+          class="goods-card"
+          wx:for="{{rightList}}"
+          wx:key="id"
+          bindtap="onGoodsClick"
+          data-id="{{item.id}}"
+        >
+          <image class="goods-img" src="{{item.image}}" mode="widthFix"></image>
+          <view class="goods-info">
+            <view class="goods-title">{{item.title}}</view>
+            <view class="goods-footer">
+              <view class="goods-price">¥{{item.price}}</view>
+              <view class="goods-points">约得 {{item.points}} 积分</view>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
+</view>

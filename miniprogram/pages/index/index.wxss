@@ -1,0 +1,260 @@
+page {
+  background-color: #F5F5F5;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.page__bd {
+  flex: 1;
+  overflow: hidden;
+}
+
+/* NavBar */
+.nav-container {
+  background-color: #FFFFFF;
+}
+
+.nav-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-bar-title {
+  font-size: 34rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+}
+
+.popup-close-icon {
+  width: 40rpx;
+  height: 40rpx;
+}
+
+.header-section {
+  padding: 20rpx 32rpx;
+  background-color: #FFFFFF;
+}
+
+.search-icon {
+  width: 36rpx;
+  height: 36rpx;
+  margin-right: 16rpx;
+  flex-shrink: 0;
+}
+
+.search-wrap {
+  background: #FFFFFF;
+  border-radius: 40rpx;
+  padding: 0 28rpx;
+  height: 80rpx;
+  border: 1rpx solid #E5E5E5;
+  display: flex;
+  align-items: center;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.weui-icon-search {
+  color: #B2B2B2 !important;
+}
+
+.search-input {
+  flex: 1;
+  font-size: 28rpx;
+  color: #191919;
+}
+
+/* 引导区 - 严格对齐 gaJPE.png */
+.guide-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 64rpx 40rpx 0;
+  gap: 32rpx;
+}
+
+.guide-icon-box {
+  width: 160rpx;
+  height: 160rpx;
+  background-color: #FFF0E8;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.guide-icon-img {
+  width: 72rpx;
+  height: 72rpx;
+}
+
+.guide-main-title {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #191919;
+}
+
+.guide-tips {
+  font-size: 26rpx;
+  color: #888888;
+  text-align: center;
+  line-height: 1.6;
+}
+
+/* 攻略区 - 间距与对焦 */
+.strategy-section {
+  padding: 0 32rpx 80rpx;
+}
+
+.section-hd {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #191919;
+  margin-bottom: 20rpx;
+}
+
+.strategy-card {
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  padding: 28rpx;
+  display: flex;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.step-badge {
+  width: 56rpx;
+  height: 56rpx;
+  background-color: #FF6B35;
+  color: #FFFFFF;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-right: 24rpx;
+}
+
+.step-text {
+  font-size: 28rpx;
+  color: #353535;
+  line-height: 1.4;
+}
+
+/* 结果弹窗 ( WeUI 扩展 ) */
+.result-card {
+  background: #F7F7F7;
+  border-radius: 24rpx;
+  padding: 24rpx;
+  display: flex;
+  margin-top: 24rpx;
+}
+
+.result-card__img {
+  width: 210rpx;
+  height: 210rpx;
+  border-radius: 16rpx;
+  flex-shrink: 0;
+}
+
+.result-card__info {
+  margin-left: 28rpx;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.result-card__title {
+  font-size: 30rpx;
+  color: #1F1F1F;
+  font-weight: 500;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+.result-card__price {
+  margin-top: 14rpx;
+  display: flex;
+  align-items: baseline;
+}
+
+.price-symbol {
+  font-size: 26rpx;
+  color: #FF3B30; /* 对于金额使用更具冲击力的红色/橙色 */
+  font-weight: bold;
+}
+
+.price-val {
+  font-size: 44rpx;
+  color: #FF3B30;
+  font-weight: bold;
+  margin-right: 14rpx;
+}
+
+.price-origin {
+  font-size: 26rpx;
+  color: #B2B2B2;
+  text-decoration: line-through;
+}
+
+.result-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 16rpx;
+}
+
+.tag-save {
+  font-size: 22rpx;
+  color: #FF3B30;
+  background-color: #FFF0F0;
+  padding: 6rpx 14rpx;
+  border-radius: 6rpx;
+  margin-right: 14rpx;
+}
+
+.tag-points {
+  font-size: 22rpx;
+  color: #FF9500;
+  background-color: #FFF9E6;
+  padding: 6rpx 14rpx;
+  border-radius: 6rpx;
+}
+
+.buy-btn {
+  width: 100% !important;
+  background-color: #FF6B35 !important;
+  color: #FFFFFF !important;
+  height: 96rpx;
+  border-radius: 48rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 34rpx;
+  font-weight: 600;
+  margin: 30rpx 0 10rpx;
+}
+
+.buy-btn:active {
+  opacity: 0.8;
+}

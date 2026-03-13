@@ -1,0 +1,8 @@
+# 微信小程序开发忽略文件
+node_modules/
+miniprogram_npm/
+cloudfunctions/**/node_modules/
+.DS_Store
+*.log
+/project.config.json.local
+.vscode/

@@ -1,0 +1,36 @@
+/**
+ * 全局样式表
+ * 架构 V2.0 强制 WeUI
+ */
+
+@import "style/weui.wxss";
+
+/* 全局 box-sizing 统一 */
+view, text, image, scroll-view, input, button {
+  box-sizing: border-box;
+}
+
+page {
+  background-color: #F5F5F5;
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica,
+    Segoe UI, Arial, Roboto, 'PingFang SC', 'miui', 'Hiragino Sans GB', 'Microsoft Yahei',
+    sans-serif;
+  height: 100%;
+  overflow: hidden;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+/* 安全区域底部适配（iPhone X/11/12/13/14/15 等刘海屏底部横条） */
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* TabBar 页面需要额外的底部安全区域占位 */
+.tab-page-bottom-spacer {
+  height: calc(env(safe-area-inset-bottom) + 120rpx);
+}
