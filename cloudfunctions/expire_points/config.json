@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "openapi": []
+  },
+  "triggers": [
+    {
+      "name": "daily_expire_timer",
+      "type": "timer",
+      "config": "0 0 2 * * * *"
+    }
+  ]
+}

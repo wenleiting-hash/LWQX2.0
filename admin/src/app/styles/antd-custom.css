@@ -1,0 +1,171 @@
+/* Ant Design 自定义样式 */
+
+/* 侧边栏菜单选中项左侧边框 */
+.ant-menu-item-selected {
+  border-left: 3px solid #FF6B35 !important;
+  padding-left: 21px !important;
+}
+
+.ant-menu-item {
+  border-left: 3px solid transparent;
+  padding-left: 24px !important;
+}
+
+/* 表格数值列右对齐 */
+.table-number-align {
+  text-align: right !important;
+}
+
+/* 空数据占位符 */
+.table-empty-placeholder {
+  color: #B2B2B2;
+}
+
+/* 身份审计信息 */
+.audit-info {
+  color: #888888;
+  font-size: 12px;
+  padding: 12px 24px;
+  background: #FFFFFF;
+  border-top: 1px solid #E5E5E5;
+}
+
+/* 状态标签优化 */
+.status-tag-success {
+  background: rgba(7, 193, 96, 0.1) !important;
+  color: #07C160 !important;
+  border: none !important;
+}
+
+.status-tag-warning {
+  background: rgba(255, 169, 64, 0.1) !important;
+  color: #FFA940 !important;
+  border: none !important;
+}
+
+.status-tag-error {
+  background: rgba(250, 81, 81, 0.1) !important;
+  color: #FA5151 !important;
+  border: none !important;
+}
+
+.status-tag-default {
+  background: rgba(136, 136, 136, 0.1) !important;
+  color: #888888 !important;
+  border: none !important;
+}
+
+/* 冻结/正常状态点 */
+.status-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  margin-right: 6px;
+}
+
+.status-dot-active {
+  background: #07C160;
+}
+
+.status-dot-frozen {
+  background: #FA5151;
+}
+
+/* 表格行分割线增强 */
+.ant-table-tbody > tr > td {
+  border-bottom: 1px solid #E5E5E5 !important;
+}
+
+/* 卡片样式优化 */
+.dashboard-card {
+  background: #FFFFFF;
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+/* 统计数字样式 */
+.stat-number {
+  font-size: 32px;
+  font-weight: 500;
+  color: #191919;
+  line-height: 1.2;
+}
+
+.stat-label {
+  font-size: 14px;
+  color: #888888;
+  margin-top: 8px;
+}
+
+/* 品牌Logo */
+.brand-logo {
+  color: #FF6B35;
+  font-size: 24px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 登录页面样式 */
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #FFF0E8 0%, #FFFFFF 100%);
+}
+
+.login-box {
+  width: 100%;
+  max-width: 400px;
+  padding: 40px;
+  background: #FFFFFF;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+}
+
+.login-title {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+/* 富文本编辑器背景 */
+.rich-text-editor {
+  background: #FFFFFF !important;
+}
+
+.rich-text-editor .ant-input,
+.rich-text-editor textarea {
+  background: #FFFFFF !important;
+}
+
+/* Quill 富文本编辑器样式优化 */
+.ql-toolbar {
+  background: #FAFAFA !important;
+  border: 1px solid #E5E5E5 !important;
+  border-radius: 4px 4px 0 0 !important;
+}
+
+.ql-container {
+  border: 1px solid #E5E5E5 !important;
+  border-top: none !important;
+  border-radius: 0 0 4px 4px !important;
+  font-size: 14px !important;
+  line-height: 1.8 !important;
+}
+
+.ql-editor {
+  min-height: 400px !important;
+  background: #FFFFFF !important;
+  color: #353535 !important;
+}
+
+.ql-editor h1,
+.ql-editor h2,
+.ql-editor h3,
+.ql-editor h4 {
+  color: #191919 !important;
+}

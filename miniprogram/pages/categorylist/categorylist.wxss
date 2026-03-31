@@ -1,0 +1,97 @@
+/* Copy waterfall styles from discover.wxss */
+.page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: #F5F5F5;
+}
+
+.filter-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 88rpx;
+  background-color: #FFFFFF;
+  padding: 0 64rpx;
+  border-bottom: 1rpx solid #F0F0F0;
+}
+
+.filter-item {
+  font-size: 28rpx;
+  color: #666;
+}
+
+.filter-item.active {
+  color: #FF6B35;
+  font-weight: 600;
+}
+
+.goods-scroll {
+  flex: 1;
+  height: 0;
+}
+
+.waterfall {
+  display: flex;
+  padding: 24rpx;
+  gap: 20rpx;
+}
+
+.column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+/* 瀑布流角标与视频配置 */
+.goods-img-wrap { position: relative; width: 100%; }
+.play-overlay { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80rpx; height: 80rpx; background-color: rgba(0, 0, 0, 0.5); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+.play-icon { color: #FFF; font-size: 32rpx; margin-left: 6rpx; }
+.discount-badge { position: absolute; top: 16rpx; left: 16rpx; background-color: #FF4D4F; color: #FFF; font-size: 20rpx; font-weight: 600; padding: 4rpx 12rpx; border-radius: 8rpx; }
+
+.goods-card { background-color: #FFFFFF; border-radius: 16rpx; overflow: hidden; box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.05); }
+.goods-img { width: 100%; height: auto; display: block; }
+.goods-info { padding: 20rpx; }
+.goods-title { font-size: 28rpx; color: #333333; line-height: 1.4; margin-bottom: 16rpx; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+.goods-footer { display: flex; flex-direction: column; gap: 8rpx; }
+.goods-price { font-size: 36rpx; color: #FF6B35; font-weight: bold; }
+.goods-points { font-size: 22rpx; color: #FF6B35; background-color: #FFF0E8; padding: 4rpx 12rpx; border-radius: 4rpx; align-self: flex-start; }
+
+/* Search Bar (新增加) */
+.search-wrap {
+  background-color: #FFFFFF;
+  padding: 16rpx 32rpx;
+}
+.search-bar {
+  display: flex;
+  align-items: center;
+  background-color: #F5F5F5;
+  border-radius: 36rpx;
+  padding: 0 16rpx 0 24rpx;
+  height: 72rpx;
+}
+.search-icon {
+  margin-right: 12rpx;
+  display: flex;
+  align-items: center;
+}
+.search-input {
+  flex: 1;
+  font-size: 28rpx;
+  color: #333;
+}
+.clear-icon {
+  padding: 10rpx;
+  display: flex;
+  align-items: center;
+}
+.search-btn {
+  background-color: #FF6B35;
+  color: #FFF;
+  font-size: 26rpx;
+  font-weight: 600;
+  padding: 10rpx 28rpx;
+  border-radius: 28rpx;
+  margin-left: 12rpx;
+}

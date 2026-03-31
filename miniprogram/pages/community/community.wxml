@@ -1,0 +1,28 @@
+<scroll-view scroll-y class="page" enhanced show-scrollbar="{{false}}">
+  <view class="content-area">
+    <!-- Hero Card -->
+    <view class="hero-card">
+      <image class="hero-img" src="{{heroImagePath}}" mode="aspectFill"></image>
+      <view class="hero-overlay">
+        <view class="hero-text-box">
+          <text class="hero-title">欢迎来到老温的交流大群</text>
+          <text class="hero-sub">与众多行业大佬聊AI</text>
+        </view>
+      </view>
+    </view>
+    
+    <!-- QR Card -->
+    <view class="qr-card">
+      <text class="qr-tip">扫码添加老温微信</text>
+      <view class="qr-container">
+        <image class="qr-code" src="{{qrImagePath}}" mode="aspectFit"></image>
+      </view>
+      <view class="wechat-row">
+        <text class="wechat-info">微信号: {{wechatId}}</text>
+        <view class="mini-copy-btn" bindtap="onCopyWechat">
+          <text class="copy-text">复制</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</scroll-view>

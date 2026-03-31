@@ -16,6 +16,8 @@ page {
 
 .page__bd {
   flex: 1;
+  height: 0;
+  width: 100%;
   overflow: hidden;
 }
 
@@ -28,6 +30,12 @@ page {
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 12rpx;
+}
+
+.nav-logo {
+  width: 44rpx;
+  height: 44rpx;
 }
 
 .nav-bar-title {
@@ -56,17 +64,42 @@ page {
 .search-wrap {
   background: #FFFFFF;
   border-radius: 40rpx;
-  padding: 0 28rpx;
+  padding: 8rpx 8rpx 8rpx 28rpx;
   height: 80rpx;
-  border: 1rpx solid #E5E5E5;
+  border: 2rpx solid #E5E5E5;
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
 }
 
 .search-bar {
   display: flex;
   align-items: center;
-  width: 100%;
+  flex: 1;
+  height: 100%;
+}
+
+.search-clear-wrap {
+  padding: 10rpx;
+  margin-right: 10rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.search-btn {
+  height: 64rpx;
+  background: #FF6B35;
+  border-radius: 32rpx;
+  color: #FFFFFF;
+  font-size: 26rpx;
+  font-weight: 600;
+  padding: 0 32rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
 .weui-icon-search {
@@ -158,19 +191,74 @@ page {
   line-height: 1.4;
 }
 
-/* 结果弹窗 ( WeUI 扩展 ) */
+/* .weui-mask fix for popup grey backgrounds */
+.weui-mask {
+  position: fixed;
+  z-index: 1000;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+/* Custom Bottom Sheet (100% Pencil Design) */
+.custom-bottom-sheet {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #FFFFFF;
+  border-radius: 48rpx 48rpx 0 0;
+  padding: 40rpx 40rpx 68rpx 40rpx;
+  z-index: 5000;
+  display: flex;
+  flex-direction: column;
+}
+
+.sheet-handle-bar {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 32rpx;
+}
+
+.sheet-handle {
+  width: 72rpx;
+  height: 8rpx;
+  background: #D0D0D0;
+  border-radius: 4rpx;
+}
+
+.sheet-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 28rpx;
+}
+
+.sheet-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #191919;
+}
+
+.sheet-close-icon {
+  width: 40rpx;
+  height: 40rpx;
+}
+
 .result-card {
   background: #F7F7F7;
   border-radius: 24rpx;
-  padding: 24rpx;
+  padding: 28rpx;
   display: flex;
-  margin-top: 24rpx;
+  margin-bottom: 32rpx;
 }
 
 .result-card__img {
-  width: 210rpx;
-  height: 210rpx;
-  border-radius: 16rpx;
+  width: 192rpx;
+  height: 192rpx;
+  border-radius: 20rpx;
   flex-shrink: 0;
 }
 
@@ -179,12 +267,13 @@ page {
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: center;
+  gap: 12rpx;
 }
 
 .result-card__title {
-  font-size: 30rpx;
-  color: #1F1F1F;
+  font-size: 28rpx;
+  color: #1A1A1A;
   font-weight: 500;
   line-height: 1.4;
   display: -webkit-box;
@@ -193,68 +282,310 @@ page {
   overflow: hidden;
 }
 
-.result-card__price {
-  margin-top: 14rpx;
+.result-card__price-row {
   display: flex;
   align-items: baseline;
-}
-
-.price-symbol {
-  font-size: 26rpx;
-  color: #FF3B30; /* 对于金额使用更具冲击力的红色/橙色 */
-  font-weight: bold;
+  gap: 16rpx;
 }
 
 .price-val {
   font-size: 44rpx;
-  color: #FF3B30;
-  font-weight: bold;
-  margin-right: 14rpx;
+  color: #FF6B35;
+  font-weight: 700;
 }
 
 .price-origin {
-  font-size: 26rpx;
+  font-size: 24rpx;
   color: #B2B2B2;
   text-decoration: line-through;
 }
 
 .result-card__tags {
   display: flex;
-  flex-wrap: wrap;
-  margin-top: 16rpx;
+  margin-top: 4rpx;
 }
 
-.tag-save {
-  font-size: 22rpx;
-  color: #FF3B30;
-  background-color: #FFF0F0;
-  padding: 6rpx 14rpx;
-  border-radius: 6rpx;
-  margin-right: 14rpx;
+.tag-combined {
+  display: flex;
+  gap: 12rpx;
+  align-items: center;
+  font-size: 24rpx;
+  color: #FF6B35;
+  background: #FFF0E8;
+  padding: 8rpx 16rpx;
+  border-radius: 8rpx;
+  font-weight: 500;
 }
 
-.tag-points {
+.tag-subsidy {
   font-size: 22rpx;
-  color: #FF9500;
-  background-color: #FFF9E6;
-  padding: 6rpx 14rpx;
-  border-radius: 6rpx;
+  color: #FFFFFF;
+  background: linear-gradient(90deg, #FF4500 0%, #FF8C00 100%);
+  padding: 6rpx 16rpx;
+  border-radius: 8rpx;
+  font-weight: 600;
+  display: inline-block;
+  box-shadow: 0 4rpx 8rpx rgba(255, 69, 0, 0.2);
+}
+
+.sheet-action {
+  width: 100%;
+  margin-bottom: 32rpx;
 }
 
 .buy-btn {
   width: 100% !important;
-  background-color: #FF6B35 !important;
-  color: #FFFFFF !important;
   height: 96rpx;
+  background: #FF6B35 !important;
   border-radius: 48rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 34rpx;
+  color: #FFFFFF !important;
+  font-size: 28rpx;
   font-weight: 600;
-  margin: 30rpx 0 10rpx;
+  padding: 0;
+  margin: 0;
+}
+
+.btn-icon {
+  width: 32rpx;
+  height: 32rpx;
+  margin-right: 16rpx;
 }
 
 .buy-btn:active {
   opacity: 0.8;
 }
+
+.sheet-footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.footer-icon {
+  width: 24rpx;
+  height: 24rpx;
+}
+
+.footer-text {
+  font-size: 22rpx;
+  color: #B2B2B2;
+}
+
+.buy-btn:active {
+  opacity: 0.8;
+}
+
+/* Custom Dialog Settings */
+.custom-dialog {
+  width: 622rpx;
+  background-color: #FFFFFF;
+  border-radius: 32rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48rpx;
+  box-sizing: border-box;
+  position: fixed;
+  z-index: 5000;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.custom-dialog--no-coupon {
+  padding: 64rpx 48rpx 48rpx 48rpx;
+  gap: 40rpx;
+}
+
+.custom-dialog--no-coupon .custom-dialog__title {
+  font-size: 32rpx;
+  font-weight: 500;
+  margin-top: 0;
+}
+
+.custom-dialog--no-coupon .custom-dialog__actions {
+  margin-top: 0;
+}
+
+.custom-dialog__title {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #191919;
+  text-align: center;
+}
+
+.custom-dialog__desc {
+  font-size: 30rpx;
+  color: #888888;
+  text-align: center;
+  margin-top: 24rpx;
+  width: 100%;
+}
+
+.custom-dialog__actions {
+  display: flex;
+  width: 100%;
+  margin-top: 48rpx;
+  gap: 24rpx;
+}
+
+.no-coupon-action {
+  margin-top: 40rpx;
+}
+
+.btn-cancel {
+  flex: 1;
+  height: 96rpx;
+  background: #F5F5F5;
+  border-radius: 48rpx;
+  border: 1rpx solid #E5E5E5;
+  color: #888888;
+  font-size: 30rpx;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.btn-confirm {
+  flex: 1;
+  height: 96rpx;
+  background: #FF6B35;
+  border-radius: 48rpx;
+  color: #FFFFFF;
+  font-size: 30rpx;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.w-full {
+  width: 100%;
+  flex: none;
+}
+
+.frown-icon {
+  width: 96rpx;
+  height: 96rpx;
+}
+
+.mt-20 {
+  margin-top: 40rpx;
+}
+
+.subsidy-alert-box {
+  margin-top: 20rpx;
+  background: #FFF0E8;
+  padding: 20rpx 24rpx;
+  border-radius: 12rpx;
+  border: 1rpx solid rgba(255, 107, 53, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+}
+
+.subsidy-alert-title {
+  color: #FF6B35;
+  font-size: 26rpx;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+}
+
+.subsidy-alert-desc {
+  color: #FF6B35;
+  font-size: 24rpx;
+  line-height: 1.4;
+  opacity: 0.9;
+}
+
+/* TKL Custom Popup (Unified Sync with Discover) */
+.tkl-popup-wrap {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 6000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.tkl-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+}
+.tkl-box {
+  width: 600rpx;
+  background-color: #FFFFFF;
+  border-radius: 24rpx;
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.tkl-header {
+  font-size: 34rpx;
+  font-weight: bold;
+  color: #333333;
+  text-align: center;
+  padding: 40rpx 0 20rpx;
+}
+.tkl-body {
+  padding: 0 40rpx 40rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+.tkl-desc {
+  font-size: 28rpx;
+  color: #666666;
+  text-align: center;
+}
+.tkl-code {
+  font-size: 40rpx;
+  font-weight: bold;
+  color: #FF6B35;
+  text-align: center;
+  padding: 20rpx 0;
+  letter-spacing: 2rpx;
+}
+.tkl-notice {
+  font-size: 24rpx;
+  color: #999999;
+  line-height: 1.5;
+  text-align: justify;
+}
+.tkl-footer {
+  display: flex;
+  border-top: 1rpx solid #EEEEEE;
+  height: 96rpx;
+}
+.tkl-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32rpx;
+  font-weight: 500;
+}
+.tkl-cancel {
+  color: #666666;
+  border-right: 1rpx solid #EEEEEE;
+}
+.tkl-confirm {
+  color: #FF6B35;
+  font-weight: bold;
+}
+

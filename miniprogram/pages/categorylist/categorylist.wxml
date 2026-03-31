@@ -1,0 +1,69 @@
+<view class="page">
+  <!-- 搜索栏 -->
+  <view class="search-wrap">
+    <view class="search-bar">
+      <icon class="search-icon" type="search" size="14" color="#999"></icon>
+      <input class="search-input" placeholder="在当前分类下搜索关键字" value="{{searchKeyword}}" bindinput="onSearchInput" bindconfirm="onSearchConfirm" confirm-type="search"/>
+      <icon class="clear-icon" type="clear" size="14" color="#999" wx:if="{{searchKeyword}}" bindtap="onClearSearch"></icon>
+      <view class="search-btn" bindtap="onSearchConfirm">查券</view>
+    </view>
+  </view>
+
+  <view class="filter-bar">
+    <view class="filter-item active">综合排序</view>
+    <view class="filter-item">销量优先</view>
+    <view class="filter-item">价格</view>
+  </view>
+
+  <scroll-view scroll-y class="goods-scroll" bindscrolltolower="onReachBottom">
+    <view class="waterfall">
+      <!-- 左列 -->
+      <view class="column">
+        <view
+          class="goods-card"
+          wx:for="{{leftList}}"
+          wx:key="id"
+          bindtap="onGoodsClick"
+          data-id="{{item.id}}"
+        >
+          <view class="goods-img-wrap">
+            <image class="goods-img" src="{{item.image}}" mode="widthFix"></image>
+            <view class="play-overlay" wx:if="{{item.video}}"><text class="play-icon">Play</text></view>
+            <view class="discount-badge" wx:if="{{item.badge}}">{{item.badge}}</view>
+          </view>
+          <view class="goods-info">
+            <view class="goods-title">{{item.title}}</view>
+            <view class="goods-footer">
+              <view class="goods-price">¥{{item.price}}</view>
+              <view class="goods-points">约得 {{item.points}} 积分</view>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 右列 -->
+      <view class="column">
+        <view
+          class="goods-card"
+          wx:for="{{rightList}}"
+          wx:key="id"
+          bindtap="onGoodsClick"
+          data-id="{{item.id}}"
+        >
+          <view class="goods-img-wrap">
+            <image class="goods-img" src="{{item.image}}" mode="widthFix"></image>
+            <view class="play-overlay" wx:if="{{item.video}}"><text class="play-icon">Play</text></view>
+            <view class="discount-badge" wx:if="{{item.badge}}">{{item.badge}}</view>
+          </view>
+          <view class="goods-info">
+            <view class="goods-title">{{item.title}}</view>
+            <view class="goods-footer">
+              <view class="goods-price">¥{{item.price}}</view>
+              <view class="goods-points">约得 {{item.points}} 积分</view>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
+</view>

@@ -1,7 +1,24 @@
 {
     "description": "项目配置文件",
     "packOptions": {
-        "ignore": [],
+        "ignore": [
+            {
+                "type": "folder",
+                "value": "Documents"
+            },
+            {
+                "type": "folder",
+                "value": "admin"
+            },
+            {
+                "type": "file",
+                "value": ".gitignore"
+            },
+            {
+                "type": "folder",
+                "value": ".gemini"
+            }
+        ],
         "include": []
     },
     "setting": {

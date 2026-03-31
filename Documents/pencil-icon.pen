@@ -1,5 +1,5 @@
 {
-  "version": "2.8",
+  "version": "2.9",
   "children": [
     {
       "type": "frame",
@@ -170,6 +170,86 @@
           "iconFontName": "person",
           "iconFontFamily": "Material Symbols Rounded",
           "fill": "#FF6B35"
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "61LHX",
+      "x": 0,
+      "y": 400,
+      "name": "frown",
+      "width": 48,
+      "height": 48,
+      "children": [
+        {
+          "type": "icon_font",
+          "id": "5Duwf",
+          "width": 48,
+          "height": 48,
+          "iconFontName": "frown",
+          "iconFontFamily": "lucide",
+          "fill": "#B2B2B2"
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "m5Obi",
+      "x": 100,
+      "y": 400,
+      "name": "close_x",
+      "width": 20,
+      "height": 20,
+      "children": [
+        {
+          "type": "icon_font",
+          "id": "FG4YJ",
+          "width": 20,
+          "height": 20,
+          "iconFontName": "x",
+          "iconFontFamily": "lucide",
+          "fill": "#B2B2B2"
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "xSxzH",
+      "x": 200,
+      "y": 400,
+      "name": "external_link",
+      "width": 16,
+      "height": 16,
+      "children": [
+        {
+          "type": "icon_font",
+          "id": "qXRpl",
+          "width": 16,
+          "height": 16,
+          "iconFontName": "external-link",
+          "iconFontFamily": "lucide",
+          "fill": "#FFFFFF"
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "UOnPA",
+      "x": 300,
+      "y": 400,
+      "name": "shield_check",
+      "width": 12,
+      "height": 12,
+      "children": [
+        {
+          "type": "icon_font",
+          "id": "96mvo",
+          "width": 12,
+          "height": 12,
+          "iconFontName": "shield-check",
+          "iconFontFamily": "lucide",
+          "fill": "#B2B2B2"
         }
       ]
     }

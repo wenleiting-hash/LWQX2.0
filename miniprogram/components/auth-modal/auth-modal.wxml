@@ -1,0 +1,26 @@
+<view class="auth-modal" wx:if="{{visible}}">
+  <view class="auth-mask"></view>
+  <view class="auth-content">
+    <view class="auth-header">
+      <text class="auth-title">微信授权登录</text>
+      <text class="auth-subtitle">小栗鼠申请获取您的头像、昵称用于安全访问页面</text>
+    </view>
+    
+    <view class="auth-form">
+      <button class="auth-avatar-btn" open-type="chooseAvatar" bind:chooseavatar="onChooseAvatar">
+        <image class="auth-avatar-img" src="{{avatarUrl || '/images/icons/avatar_user.png'}}" mode="aspectFill"></image>
+      </button>
+      <view style="font-size:24rpx; color:#999; margin-bottom: 30rpx;">点击上方授权头像</view>
+      
+      <view class="auth-input-group">
+        <text class="auth-input-label">昵称</text>
+        <input type="nickname" class="auth-nickname-input" placeholder="请输入或获取微信昵称" value="{{nickName}}" bindinput="onNicknameChange" bindblur="onNicknameChange" bindchange="onNicknameChange" />
+      </view>
+    </view>
+
+    <view class="auth-footer">
+      <button class="auth-cancel-btn" bindtap="onCancelAuth">无情拒绝</button>
+      <button class="auth-confirm-btn" bindtap="onConfirmAuth">授权并登录</button>
+    </view>
+  </view>
+</view>

@@ -7,6 +7,8 @@ page {
   display: flex;
   flex-direction: column;
   height: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
 /* NavBar */
@@ -27,18 +29,22 @@ page {
 }
 
 /* Tabs */
+.tabs-scroll {
+  width: 100%;
+  background-color: #FFFFFF;
+  border-bottom: 1rpx solid #F0F0F0;
+  position: sticky;
+  z-index: 100;
+}
+
 .tabs-container {
   display: flex;
-  background-color: #FFFFFF;
   padding: 0 32rpx;
   height: 88rpx;
   align-items: center;
   justify-content: flex-start;
   gap: 48rpx;
-  border-bottom: 1rpx solid #F0F0F0;
-  position: sticky;
-  top: 0;
-  z-index: 100;
+  white-space: nowrap;
 }
 
 .tab-item {
@@ -70,10 +76,77 @@ page {
   border-radius: 3rpx;
 }
 
-/* 瀑布流布局 */
+/* 瀑布流及上部滚动 */
 .goods-scroll {
   flex: 1;
+  height: 0;
+  width: 100%;
 }
+
+/* Banner */
+.banner-area {
+  padding: 24rpx 24rpx 0;
+}
+.banner-img {
+  width: 100%;
+  border-radius: 16rpx;
+}
+
+/* Bento Area */
+.bento-area {
+  padding: 32rpx 32rpx 16rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+.bento-row {
+  display: flex;
+  flex-direction: row;
+  gap: 24rpx;
+}
+.bento-card {
+  flex: 1;
+  height: 144rpx;
+  border-radius: 32rpx;
+  padding: 0 16rpx 0 32rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.bento-text {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+.bento-title {
+  font-size: 26rpx;
+  font-weight: 600;
+}
+.bento-sub {
+  font-size: 20rpx;
+}
+.bento-icon {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 16rpx;
+}
+
+/* Card Themes */
+.card-digital { background-color: #F0F7FF; }
+.digital-title { color: #0052D9; }
+.digital-sub { color: rgba(0, 82, 217, 0.5); }
+
+.card-beauty { background-color: #FFF0F5; }
+.beauty-title { color: #D4005E; }
+.beauty-sub { color: rgba(212, 0, 94, 0.5); }
+
+.card-toy { background-color: #FFF8E7; }
+.toy-title { color: #B77900; }
+.toy-sub { color: rgba(183, 121, 0, 0.5); }
+
+.card-dress { background-color: #F3EFFF; }
+.dress-title { color: #5A3AAA; }
+.dress-sub { color: rgba(90, 58, 170, 0.5); }
 
 .waterfall {
   display: flex;
@@ -135,4 +208,253 @@ page {
   padding: 4rpx 12rpx;
   border-radius: 4rpx;
   align-self: flex-start;
+}
+
+/* 瀑布流角标与视频配置 */
+.goods-img-wrap {
+  position: relative;
+  width: 100%;
+}
+.play-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80rpx;
+  height: 80rpx;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.play-icon {
+  color: #FFF;
+  font-size: 32rpx;
+  margin-left: 6rpx;
+}
+.discount-badge {
+  position: absolute;
+  top: 16rpx;
+  left: 16rpx;
+  background-color: #FF4D4F;
+  color: #FFF;
+  font-size: 20rpx;
+  font-weight: 600;
+  padding: 4rpx 12rpx;
+  border-radius: 8rpx;
+}
+
+/* Detail Popup */
+.detail-popup-wrap {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+.detail-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+}
+.detail-sheet {
+  position: relative;
+  width: 100%;
+  background-color: #FFF;
+  border-radius: 48rpx 48rpx 0 0;
+  padding: 48rpx 48rpx 68rpx 48rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+  box-sizing: border-box;
+}
+.sheet-header {
+  display: flex;
+  justify-content: flex-end;
+}
+.close-btn {
+  font-size: 40rpx;
+  color: #999;
+  line-height: 1;
+}
+.sheet-img {
+  width: 100%;
+  height: 480rpx;
+  border-radius: 24rpx;
+  background-color: #f5f5f5;
+}
+.sheet-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+  line-height: 1.4;
+}
+.sheet-points {
+  align-self: flex-start;
+  font-size: 24rpx;
+  color: #FF6B35;
+  background-color: #FFF0E8;
+  padding: 8rpx 24rpx;
+  border-radius: 8rpx;
+}
+.sheet-price-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 16rpx;
+  margin-top: 8rpx;
+}
+.sheet-price {
+  font-size: 56rpx;
+  font-weight: bold;
+  color: #FF6B35;
+  line-height: 1;
+}
+.sheet-original-price {
+  font-size: 28rpx;
+  color: #999;
+  text-decoration: line-through;
+  line-height: 1.2;
+}
+.buy-btn {
+  width: 100%;
+  height: 96rpx;
+  background-color: #FF6B35;
+  color: #FFF;
+  font-size: 32rpx;
+  font-weight: bold;
+  border-radius: 48rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 16rpx;
+}
+
+/* Search Bar (新增加) */
+.search-wrap {
+  background-color: #FFFFFF;
+  padding: 16rpx 32rpx;
+}
+.search-bar {
+  display: flex;
+  align-items: center;
+  background-color: #F5F5F5;
+  border-radius: 36rpx;
+  padding: 0 16rpx 0 24rpx;
+  height: 72rpx;
+}
+.search-icon {
+  margin-right: 12rpx;
+  display: flex;
+  align-items: center;
+}
+.search-input {
+  flex: 1;
+  font-size: 28rpx;
+  color: #333;
+}
+.clear-icon {
+  padding: 10rpx;
+  display: flex;
+  align-items: center;
+}
+.search-btn {
+  background-color: #FF6B35;
+  color: #FFF;
+  font-size: 26rpx;
+  font-weight: 600;
+  padding: 10rpx 28rpx;
+  border-radius: 28rpx;
+  margin-left: 12rpx;
+}
+
+/* TKL Custom Popup */
+.tkl-popup-wrap {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.tkl-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+}
+.tkl-box {
+  width: 600rpx;
+  background-color: #FFFFFF;
+  border-radius: 24rpx;
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.tkl-header {
+  font-size: 34rpx;
+  font-weight: bold;
+  color: #333333;
+  text-align: center;
+  padding: 40rpx 0 20rpx;
+}
+.tkl-body {
+  padding: 0 40rpx 40rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+.tkl-desc {
+  font-size: 28rpx;
+  color: #666666;
+  text-align: center;
+}
+.tkl-code {
+  font-size: 40rpx;
+  font-weight: bold;
+  color: #FF6B35;
+  text-align: center;
+  padding: 20rpx 0;
+  letter-spacing: 2rpx;
+}
+.tkl-notice {
+  font-size: 24rpx;
+  color: #999999;
+  line-height: 1.5;
+  text-align: justify;
+}
+.tkl-footer {
+  display: flex;
+  border-top: 1rpx solid #EEEEEE;
+  height: 96rpx;
+}
+.tkl-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32rpx;
+  font-weight: 500;
+}
+.tkl-cancel {
+  color: #666666;
+  border-right: 1rpx solid #EEEEEE;
+}
+.tkl-confirm {
+  color: #FF6B35;
+  font-weight: bold;
 }

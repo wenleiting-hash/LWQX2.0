@@ -3,7 +3,12 @@
     "pages/index/index",
     "pages/discover/discover",
     "pages/orders/orders",
-    "pages/mine/mine"
+    "pages/mine/mine",
+    "pages/categorylist/categorylist",
+    "pages/webview/webview",
+    "pages/points_detail/points_detail",
+    "pages/community/community",
+    "pages/guide/guide"
   ],
   "window": {
     "backgroundColor": "#F7F7F7",
@@ -47,5 +52,6 @@
   "style": "v2",
   "sitemapLocation": "sitemap.json",
   "lazyCodeLoading": "requiredComponents",
-  "darkmode": true
+  "darkmode": true,
+  "__usePrivacyCheck__": false
 }

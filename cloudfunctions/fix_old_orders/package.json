@@ -1,0 +1,9 @@
+{
+    "name": "fix_old_orders",
+    "version": "1.0.0",
+    "description": "一键修复旧订单数据字段对齐",
+    "main": "index.js",
+    "dependencies": {
+        "wx-server-sdk": "~3.0.4"
+    }
+}

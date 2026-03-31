@@ -1,0 +1,14 @@
+{
+    "name": "claim_order",
+    "version": "1.0.0",
+    "description": "认领漏跟淘宝订单",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "wx-server-sdk": "~3.0.4"
+    }
+}

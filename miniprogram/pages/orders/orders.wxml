@@ -20,29 +20,49 @@
     </view>
   </view>
 
-  <!-- 防退款提示 -->
+  <!-- 防退款提示 & 找回订单 -->
   <view class="notice-bar">
     <image class="notice-icon" src="/images/icons/info_orange.png" mode="aspectFit"></image>
-    <text class="notice-text">为防退款，积分将于确认收货后次月20日到账</text>
+    <text class="notice-text">积分将于确认收货后次月20日到账</text>
+    <view class="claim-trigger-btn" bindtap="onShowClaimModal">找回订单</view>
   </view>
 
   <!-- 订单列表 -->
-  <scroll-view scroll-y class="order-scroll">
-    <view class="order-list">
+  <scroll-view scroll-y class="order-scroll" bindscrolltolower="onReachBottom">
+    <!-- 有数据时的列表 -->
+    <view class="order-list" wx:if="{{orderList.length > 0}}">
       <view class="order-card" wx:for="{{orderList}}" wx:key="id" bindtap="onOrderTap" data-index="{{index}}">
-        <image class="order-img" src="{{item.image}}" mode="aspectFill"></image>
+        <image class="order-img" src="{{item.image || '/images/logo.png'}}" mode="aspectFill"></image>
         <view class="order-main">
           <view class="order-top">
             <view class="order-title">{{item.title}}</view>
-            <view class="order-points status-{{item.status}}">{{item.points}}</view>
+            <view class="order-points status-{{item.status}}">+{{item.points}}积分</view>
+          </view>
+          <view class="order-prices">
+            <text class="price-original">原价 ¥{{item.originalPrice}}</text>
+            <text class="price-actual">券后 ¥{{item.actualPrice}}</text>
+            <text class="price-save">已省 ¥{{item.couponAmount}}</text>
           </view>
           <view class="order-bottom">
-            <view class="order-info">{{item.date}} · 订单尾号 ****{{item.orderId}}</view>
+            <view class="order-info">{{item.date || item.createTime}} · 尾号 {{item.serialNo ? item.serialNo.substring(item.serialNo.length - 4) : item.orderId.substring(item.orderId.length - 4)}}</view>
             <view class="order-status-tag tag-{{item.status}}">{{item.statusText}}</view>
           </view>
         </view>
       </view>
     </view>
+    
+    <!-- 数据为空时的缺省态 -->
+    <view class="empty-state" wx:if="{{orderList.length === 0 && !isLoading}}" style="display:flex; flex-direction:column; align-items:center; padding-top:200rpx;">
+      <view class="empty-text" style="color:#999; font-size:30rpx;">暂无相关订单数据</view>
+    </view>
+    
+    <!-- 到底提示 -->
+    <view class="loading-more" wx:if="{{orderList.length > 0 && !hasMore}}" style="text-align:center; color:#ccc; font-size:24rpx; padding:30rpx 0;">
+      -- 没有更多订单啦 --
+    </view>
+    
+    <!-- 防遮挡占位垫(适配底部原生tabBar高度及安全区) -->
+    <view class="safe-area-spacer" style="height: 100rpx; padding-bottom: env(safe-area-inset-bottom);"></view>
   </scroll-view>
 
   <!-- 订单详情弹层 -->
@@ -63,7 +83,11 @@
       <view class="stats-row">
         <view class="stats-item">
           <text class="stats-label">查券已省（元）</text>
-          <text class="stats-value stats-value--save">{{currentOrder.saved}}</text>
+          <text class="stats-value stats-value--save">{{currentOrder.couponAmount || currentOrder.saved}}</text>
+        </view>
+        <view class="stats-item">
+          <text class="stats-label">实付金额</text>
+          <text class="stats-value">¥{{currentOrder.actualPrice || currentOrder.orderAmount}}</text>
         </view>
         <view class="stats-item">
           <text class="stats-label">预估获得积分</text>
@@ -75,15 +99,21 @@
       <!-- 详情信息行 -->
       <view class="info-rows">
         <view class="info-row">
-          <text class="info-label">订单流水号</text>
+          <text class="info-label">系统流水号</text>
           <view class="info-value-wrap">
-            <text class="info-value">{{currentOrder.orderNo}}</text>
-            <text class="copy-btn" bindtap="onCopyOrderNo" data-no="{{currentOrder.orderNo}}">复制</text>
+            <text class="info-value">{{currentOrder.serialNo}}</text>
+            <text class="copy-btn" bindtap="onCopyOrderNo" data-no="{{currentOrder.serialNo}}">复制</text>
+          </view>
+        </view>
+        <view class="info-row" wx:if="{{currentOrder.orderId}}">
+          <text class="info-label">平台单号</text>
+          <view class="info-value-wrap">
+            <text class="info-value" style="font-size:24rpx; color:#999;">{{currentOrder.orderId}}</text>
           </view>
         </view>
         <view class="info-row">
           <text class="info-label">下单时间</text>
-          <text class="info-value">{{currentOrder.date}}</text>
+          <text class="info-value">{{currentOrder.createTime}}</text>
         </view>
         <view class="info-row">
           <text class="info-label">账目状态</text>
@@ -93,6 +123,23 @@
       <!-- 底部说明 -->
       <view class="sheet-footer">
         <text class="footer-text">积分将于确认收货后次月20日到账</text>
+      </view>
+    </view>
+  </view>
+
+  <auth-modal visible="{{showAuthModal}}" bind:success="onAuthSuccess" bind:cancel="onAuthCancel" />
+
+  <!-- 找回订单弹层 -->
+  <view class="claim-overlay" wx:if="{{showClaimModal}}" bindtap="onCloseClaimModal">
+    <view class="claim-modal" catchtap="noop">
+      <view class="claim-header">找回丢失订单</view>
+      <view class="claim-body">
+        <text class="claim-desc">如果在淘宝下单后未能在此看到订单，您可以通过订单号进行补登（注意：同步存在延迟，建议下单10分钟后尝试）。</text>
+        <input class="claim-input" placeholder="请输入18位淘宝订单号" type="number" cursor-spacing="80" value="{{claimOrderNo}}" bindinput="onClaimInput" />
+      </view>
+      <view class="claim-footer">
+        <view class="claim-btn-cancel" bindtap="onCloseClaimModal">取消</view>
+        <view class="claim-btn-confirm" bindtap="submitClaim">补登找回</view>
       </view>
     </view>
   </view>

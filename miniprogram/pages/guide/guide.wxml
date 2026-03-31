@@ -1,0 +1,28 @@
+<scroll-view scroll-y class="page" enhanced show-scrollbar="{{false}}">
+  <view class="content-area">
+    <!-- Loading State -->
+    <view wx:if="{{loading}}" style="text-align: center; padding-top: 100rpx;">
+      <text style="color: #999; font-size: 24rpx;">加载中...</text>
+    </view>
+
+    <!-- Content -->
+    <block wx:elif="{{categories.length > 0}}">
+      <view class="card" wx:for="{{categories}}" wx:key="title">
+        <text class="card-title">{{item.title}}</text>
+        <view class="qa-item" wx:for="{{item.items}}" wx:for-item="qa" wx:key="q">
+          <text class="q-text">Q：{{qa.q}}</text>
+          <text class="a-text">A：{{qa.a}}</text>
+        </view>
+      </view>
+    </block>
+
+    <!-- Empty State -->
+    <view wx:else style="text-align: center; padding-top: 100rpx;">
+      <text style="color: #999; font-size: 24rpx;">暂无说明文档</text>
+    </view>
+    
+    <view class="contact-section">
+      <text class="contact-text">如有其他疑问，请随时咨询专属客服。</text>
+    </view>
+  </view>
+</scroll-view>

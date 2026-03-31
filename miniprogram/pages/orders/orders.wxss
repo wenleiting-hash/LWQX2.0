@@ -7,6 +7,8 @@ page {
   display: flex;
   flex-direction: column;
   height: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
 /* NavBar */
@@ -92,6 +94,8 @@ page {
 /* 订单列表 */
 .order-scroll {
   flex: 1;
+  height: 0;
+  width: 100%;
 }
 
 .order-list {
@@ -155,11 +159,38 @@ page {
 .status-settled { color: #07C160; }
 .status-invalid { color: #AAAAAA; }
 
+.order-prices {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  margin-top: 10rpx;
+}
+
+.price-original {
+  font-size: 22rpx;
+  color: #AAAAAA;
+  text-decoration: line-through;
+}
+
+.price-actual {
+  font-size: 26rpx;
+  color: #1A1A1A;
+  font-weight: 500;
+}
+
+.price-save {
+  font-size: 22rpx;
+  color: #EB2F96;
+  background-color: #FFF0F6;
+  padding: 2rpx 8rpx;
+  border-radius: 4rpx;
+}
+
 .order-bottom {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 12rpx;
+  margin-top: 10rpx;
 }
 
 .order-info {
@@ -243,7 +274,7 @@ page {
 /* 统计数据行 */
 .stats-row {
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
   padding: 32rpx 0;
 }
 
@@ -252,15 +283,16 @@ page {
   flex-direction: column;
   align-items: center;
   gap: 12rpx;
+  flex: 1;
 }
 
 .stats-label {
-  font-size: 24rpx;
+  font-size: 22rpx;
   color: #888888;
 }
 
 .stats-value {
-  font-size: 56rpx;
+  font-size: 44rpx;
   font-weight: bold;
   color: #1A1A1A;
 }
@@ -331,3 +363,101 @@ page {
   font-size: 22rpx;
   color: #AAAAAA;
 }
+
+/* ========== 找回订单入口交互 ========== */
+.claim-trigger-btn {
+  font-size: 22rpx;
+  color: #EB2F96;
+  background-color: #FFF0F6;
+  padding: 6rpx 16rpx;
+  border-radius: 20rpx;
+  font-weight: 500;
+  margin-left: auto;
+}
+
+/* ========== 找回订单弹窗 ========== */
+.claim-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.claim-modal {
+  width: 540rpx;
+  background-color: #FFFFFF;
+  border-radius: 24rpx;
+  padding: 40rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 30rpx;
+}
+
+.claim-header {
+  font-size: 34rpx;
+  font-weight: 600;
+  color: #1A1A1A;
+  text-align: center;
+}
+
+.claim-body {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.claim-desc {
+  font-size: 24rpx;
+  color: #888;
+  line-height: 1.5;
+}
+
+.claim-input {
+  height: 80rpx;
+  background-color: #F5F5F5;
+  border-radius: 12rpx;
+  padding: 0 24rpx;
+  font-size: 28rpx;
+  color: #1A1A1A;
+}
+
+.claim-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20rpx;
+  margin-top: 10rpx;
+}
+
+.claim-btn-cancel {
+  flex: 1;
+  height: 80rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #F5F5F5;
+  color: #666;
+  font-size: 28rpx;
+  border-radius: 40rpx;
+}
+
+.claim-btn-confirm {
+  flex: 1;
+  height: 80rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #FF6B35;
+  color: #FFF;
+  font-size: 28rpx;
+  border-radius: 40rpx;
+  font-weight: 500;
+}
+
+
