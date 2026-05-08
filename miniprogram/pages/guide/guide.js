@@ -1,31 +1,31 @@
+import { API } from '../../utils/api';
+
 Page({
   data: {
-    loading: true,
-    categories: []
+    tutorial_content: ''
   },
 
-  onLoad() {
-    this.fetchGuideData();
-  },
-
-  async fetchGuideData() {
-    try {
-      const res = await wx.cloud.callFunction({
-        name: 'get_system_config'
-      });
-      
-      if (res.result && res.result.success && res.result.data.documentation) {
-        this.setData({
-          categories: res.result.data.documentation,
-          loading: false
-        });
-      } else {
-        // 如果没配置，由于之前是硬编码，我们暂时保持一个空状态或稍后补齐
-        this.setData({ loading: false });
+  async onLoad() {
+    let config = getApp().globalData.systemConfig || {};
+    
+    // 如果没有获取到配置，主动拉取一次
+    if (!config.tutorial_content) {
+      try {
+        config = await API.getConfig();
+        if (config) {
+          getApp().globalData.systemConfig = config;
+        }
+      } catch (e) {
+        console.error('获取配置失败', e);
       }
-    } catch (e) {
-      console.error('获取说明文档失败:', e);
-      this.setData({ loading: false });
     }
+
+    if (config && config.tutorial_content) {
+      this.setData({ tutorial_content: config.tutorial_content });
+    }
+  },
+
+  goHome() {
+    wx.switchTab({ url: '/pages/index/index' });
   }
 });

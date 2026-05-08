@@ -1,0 +1,84 @@
+<view class="ranking-list-container pb-safe">
+  
+  <!-- Feed Tabs (Taobao / JD) -->
+  <view class="hot-tabs-container">
+    <view class="hot-tab-item {{platform === 'tb' ? 'tab-active' : ''}}" bindtap="onTabChange" data-pf="tb">
+      <text class="hot-tab-text">淘宝商品</text>
+    </view>
+    <view class="hot-tab-item {{platform === 'jd' ? 'tab-active' : ''}}" bindtap="onTabChange" data-pf="jd">
+      <text class="hot-tab-text">京东商品</text>
+    </view>
+  </view>
+
+  <!-- Sort Bar -->
+  <view class="sort-bar">
+    <view class="sort-item {{sortType === 'default' ? 'active' : ''}}" bindtap="onSortChange" data-type="default">综合</view>
+    <view class="sort-item {{sortType === 'sales' ? 'active' : ''}}" bindtap="onSortChange" data-type="sales">
+      <text>销量</text>
+      <view class="sort-arrows">
+        <view class="arrow-up {{sortType === 'sales' && sortOrder === 'asc' ? 'active-arrow' : ''}}"></view>
+        <view class="arrow-down {{sortType === 'sales' && sortOrder === 'desc' ? 'active-arrow' : ''}}"></view>
+      </view>
+    </view>
+    <view class="sort-item price-sort {{sortType === 'price' ? 'active' : ''}}" bindtap="onSortChange" data-type="price">
+      <text>价格</text>
+      <view class="sort-arrows">
+        <view class="arrow-up {{sortType === 'price' && sortOrder === 'asc' ? 'active-arrow' : ''}}"></view>
+        <view class="arrow-down {{sortType === 'price' && sortOrder === 'desc' ? 'active-arrow' : ''}}"></view>
+      </view>
+    </view>
+  </view>
+
+  <!-- Item List -->
+  <view class="rank-list">
+    <view class="list-item" wx:for="{{items}}" wx:key="tao_id" hover-class="active-scale" bindtap="goToDetail" data-item="{{item}}">
+      
+      <!-- Big Number Indicator -->
+      <view class="top-number {{index === 0 ? 'top-1' : index === 1 ? 'top-2' : index === 2 ? 'top-3' : 'top-other'}}">{{index + 1}}</view>
+
+      <!-- Product Image -->
+      <view class="item-img-wrapper">
+        <image class="item-img" src="{{item.image_url}}" mode="aspectFill" lazy-load="true"></image>
+        <view class="platform-tag" style="background-color: rgba(255,98,0,0.9);">{{item.platform === 'taobao' ? '淘宝' : '京东'}}</view>
+      </view>
+
+      <!-- Product Info -->
+      <view class="item-info">
+        <view class="item-title line-clamp-2">{{item.title}}</view>
+        
+        <view class="item-coupon-row">
+          <view class="coupon-tag" style="background-color: rgba(255,98,0,0.05); border-color: rgba(255,98,0,0.3);">
+            <text class="coupon-txt" style="color: #FF6200;">券</text>
+            <text class="coupon-val" style="color: #FF6200;">¥{{item.coupon_amount}}</text>
+          </view>
+          <view style="font-size: 20rpx; color: #999; margin-left: 12rpx;">已售 {{item.sales_num}}</view>
+        </view>
+
+        <view class="item-price-row">
+          <view class="price-box">
+            <text class="price-symbol" style="color: #FF6200;">¥</text>
+            <text class="price-val" style="color: #FF6200;">{{item.coupon_price}}</text>
+            <text class="price-ori">¥{{item.original_price}}</text>
+          </view>
+          <view class="buy-btn">领券抢购</view>
+        </view>
+        
+      </view>
+    </view>
+    
+    <!-- Loading & Empty States -->
+    <view class="loading-state" wx:if="{{isLoading}}">
+      <view class="spinner"></view>
+      <text class="loading-text">全力加载榜单中...</text>
+    </view>
+    <view class="empty-state" wx:elif="{{items.length === 0}}">
+      暂无上榜商品~
+    </view>
+    <view class="empty-state" wx:elif="{{!hasMore}}">
+      已经到底啦~
+    </view>
+    <view class="loading-more-state" wx:elif="{{isLoadingMore}}">
+      <view class="spinner-small"></view>
+    </view>
+  </view>
+</view>

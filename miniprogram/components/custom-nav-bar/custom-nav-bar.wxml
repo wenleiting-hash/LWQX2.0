@@ -1,0 +1,23 @@
+<view class="custom-nav-bar {{bgClass}}" style="padding-top: {{statusBarHeight}}px; background-color: {{backgroundColor}}; {{bgImage ? 'background-image: url(' + bgImage + ');' : ''}}">
+  <view class="nav-bar-content flex flex-row items-center" style="height: {{navBarHeight}}px; padding-right: {{capsuleRightSpace}}px; padding-left: 12px;">
+    
+    <!-- 返回按钮区 -->
+    <view class="back-btn flex items-center justify-center h-full px-2 relative z-10" bindtap="goBack" wx:if="{{showBack}}">
+      <!-- 简单的返回箭头 icon，可以替换成SVG或图片 -->
+      <view class="back-arrow {{theme === 'white' ? 'border-white' : 'border-black'}}"></view>
+    </view>
+    
+    <!-- 标题区 -->
+    <block wx:if="{{alignLeft}}">
+      <view class="title flex-1 text-left font-bold {{theme === 'white' ? 'text-white' : 'text-gray-900'}} relative z-10" style="font-size: 36rpx; padding-left: 32rpx;">
+        {{title}}
+      </view>
+    </block>
+    <block wx:else>
+      <view class="title absolute left-0 right-0 text-center font-bold {{theme === 'white' ? 'text-white' : 'text-gray-900'}} pointer-events-none" style="z-index: 1; font-size: 36rpx;">
+        {{title}}
+      </view>
+    </block>
+    
+  </view>
+</view>

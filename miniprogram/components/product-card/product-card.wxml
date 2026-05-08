@@ -1,0 +1,82 @@
+<view class="product-card layout-{{layout}} bg-white shadow-sm active-scale" bindtap="openDetail">
+  <!-- List 布局独有的排名侧边栏 -->
+  <view class="rank-sidebar flex flex-col items-center justify-center w-16 flex-shrink-0" wx:if="{{layout === 'list' && rankNumber > 0}}">
+    <!-- 金银铜图标 -->
+    <view class="rank-medal w-10 h-10 rounded-full flex items-center justify-center text-white text-base font-bold shadow-sm mb-1 {{rankNumber === 1 ? 'rank-gold' : (rankNumber === 2 ? 'rank-silver' : 'rank-bronze')}}">
+      {{rankNumber === 1 ? '👑' : (rankNumber === 2 ? '②' : '③')}}
+    </view>
+    <!-- 火力值 -->
+    <text class="fire-value font-bold">🔥 {{100 - rankNumber * 3}}</text>
+  </view>
+
+  <!-- 图片区 -->
+  <view class="image-wrapper">
+    <!-- 排名角标 -->
+    <view class="rank-badge rank-{{rankNumber}}" wx:if="{{rankNumber > 0 && layout === 'grid'}}">
+      {{rankNumber}}
+    </view>
+    
+    <image class="cover-img" src="{{item.image_url}}" mode="aspectFill" lazy-load="{{true}}"></image>
+    
+    <!-- 平台角标 -->
+    <view class="platform-badge flex items-center justify-center shadow-sm {{item.platform === 'taobao' ? 'badge-taobao' : 'badge-jd'}} {{badgePosition === 'bottom-right' ? 'pos-bottom-right' : 'pos-top-left'}}" wx:if="{{showPlatform && item.platform}}">
+      {{item.platform === 'taobao' ? '淘' : '京'}}
+    </view>
+
+    <!-- 促销角标 -->
+    <view class="promo-tag text-white font-medium shadow-sm" wx:if="{{item.tag}}">
+      {{item.tag}}
+    </view>
+  </view>
+
+  <!-- 内容区 -->
+  <view class="info-content">
+    <block wx:if="{{!isCommunity}}">
+      <view class="title-row">
+        <text class="title-text text-sm font-medium text-gray-900 line-clamp-2">{{item.title}}</text>
+      </view>
+    </block>
+    <block wx:else>
+      <view class="title-row flex flex-col">
+        <text class="text-xs text-brand font-bold">{{item.nickname_masked || '神秘用户'}}</text>
+        <text class="text-xs text-gray-500 mt-1">刚刚下单了...</text>
+        <text class="text-xs text-gray-800 line-clamp-1 mt-1">{{item.title}}</text>
+      </view>
+    </block>
+
+    <view class="card-bottom">
+      <!-- 销量 -->
+      <view class="stats-row text-xs text-gray-500 flex flex-row items-center gap-2" wx:if="{{showSales && !isCommunity}}">
+        <text wx:if="{{item.sales_num}}">已售 {{item.sales_num}}件</text>
+      </view>
+
+      <!-- 价格区 -->
+      <view class="price-row flex flex-row items-center justify-between mt-1">
+        <view class="flex flex-row items-baseline gap-1">
+          <text class="text-xs text-brand font-bold">¥</text>
+          <text class="text-xl font-black text-brand">{{item.coupon_price}}</text>
+          <text class="text-xs text-gray-400 line-through price-orig" wx:if="{{item.original_price > item.coupon_price && !isCommunity}}">¥{{item.original_price}}</text>
+        </view>
+        
+        <view class="flex flex-row items-center gap-2">
+          <block wx:if="{{!isCommunity}}">
+            <view class="save-badge font-bold shadow-sm" wx:if="{{item.coupon_amount > 0}}">
+              省¥{{item.coupon_amount}}
+            </view>
+            <view class="action-btn flex items-center justify-center">抢</view>
+          </block>
+          <block wx:else>
+            <view class="save-badge bg-red-100 text-brand text-xs font-bold px-2 py-1 rounded" wx:if="{{item.saved_amount > 0 || (item.original_price - item.coupon_price) > 0}}">
+              已省 ¥{{item.saved_amount || (item.original_price - item.coupon_price)}}
+            </view>
+          </block>
+        </view>
+      </view>
+      
+      <!-- 店铺名 -->
+      <view class="text-xs text-gray-400 line-clamp-1 mt-1" wx:if="{{item.shop_name}}">
+        {{item.shop_name}}
+      </view>
+    </view>
+  </view>
+</view>

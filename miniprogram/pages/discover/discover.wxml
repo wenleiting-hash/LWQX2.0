@@ -1,173 +1,119 @@
-<view class="page">
-  <!-- NavBar -->
-  <view class="nav-container" style="padding-top: {{statusBarHeight}}px;">
-    <view class="nav-bar" style="height: {{navHeight}}px;">
-      <text class="nav-bar-title">发现好物</text>
-    </view>
-  </view>
-
-  <!-- 搜索栏 -->
-  <view class="search-wrap">
-    <view class="search-bar">
-      <icon class="search-icon" type="search" size="14" color="#999"></icon>
-      <input class="search-input" placeholder="粘贴商品标题或关键字，查隐藏优惠" value="{{searchKeyword}}" bindinput="onSearchInput" bindconfirm="onSearchConfirm" confirm-type="search"/>
-      <icon class="clear-icon" type="clear" size="14" color="#999" wx:if="{{searchKeyword}}" bindtap="onClearSearch"></icon>
-      <view class="search-btn" bindtap="onSearchConfirm">查券</view>
-    </view>
-  </view>
-
-  <!-- 顶置 Tabs -->
-  <scroll-view class="tabs-scroll" scroll-x enhanced show-scrollbar="{{false}}">
-    <view class="tabs-container">
-      <view
-        wx:for="{{tabs}}"
-        wx:key="id"
-        class="tab-item {{activeTab === item.id ? 'active' : ''}}"
-        bindtap="onTabClick"
-        data-id="{{item.id}}"
-      >
-        <text class="tab-text">{{item.title}}</text>
-        <view class="tab-indicator" wx:if="{{activeTab === item.id}}"></view>
+<view class="discover-container pb-safe">
+  
+  <!-- Search Bar -->
+  <view class="search-container">
+    <view class="search-bar-wrapper">
+      <view class="search-platform-prefix" bindtap="switchSearchPlatform">
+        <text class="prefix-text">{{searchPlatform === 'tb' ? '淘券' : '京券'}}</text>
+        <view class="prefix-arrow"></view>
+      </view>
+      <view class="search-bar-inner">
+        <input class="search-input" placeholder="搜索商品，查找大额优惠券" placeholder-class="placeholder" value="{{searchKeyword}}" bindinput="onSearchInput" bindconfirm="doSearch" confirm-type="search" />
+        <view class="icon-search search-icon" bindtap="doSearch"></view>
       </view>
     </view>
-  </scroll-view>
+  </view>
 
-  <!-- Content 区域 (支持滚动包裹下方所有内容) -->
-  <scroll-view scroll-y class="goods-scroll" bindscrolltolower="onReachBottom">
+
+
+  <!-- Main Content -->
+  <view class="content-wrapper">
     
-    <!-- Banner Area -->
-    <view class="banner-area">
-      <image class="banner-img" src="/images/discover/AH9Rl.png" mode="widthFix"></image>
+    <!-- Grid Menu (金刚区) -->
+    <view class="grid-menu-card shadow-card">
+      <block wx:if="{{!isLoading}}">
+        <view class="grid-menu">
+          <view class="grid-item" wx:for="{{icons}}" wx:key="id" bindtap="goToCategoryList" data-item="{{item}}" hover-class="opacity-80 scale-98">
+            <view class="icon-wrapper" style="background-color: {{item.bgColor}};">
+              <view class="icon-lucide {{item.iconClass}}" style="color: {{item.color}};" />
+            </view>
+            <text class="icon-text">{{item.name}}</text>
+          </view>
+        </view>
+      </block>
+      <block wx:else>
+        <!-- Skeleton Grid Menu -->
+        <view class="grid-menu">
+          <view class="grid-item" wx:for="{{[1,2,3,4,5,6,7,8]}}" wx:key="*this">
+            <view class="skeleton-block icon-wrapper" style="border-radius: 28rpx;"></view>
+            <view class="skeleton-block" style="width: 80rpx; height: 24rpx; margin-top: 4rpx;"></view>
+          </view>
+        </view>
+      </block>
     </view>
 
-    <!-- King Kong Bento Area -->
-    <view class="bento-area">
-      <view class="bento-row">
-        <view class="bento-card card-digital" bindtap="onCategoryClick" data-type="digital">
-          <view class="bento-text">
-            <text class="bento-title digital-title">数码家电</text>
-            <text class="bento-sub digital-sub">潮酷数码</text>
-          </view>
-          <image class="bento-icon" src="/images/discover/PPAS9.png"></image>
-        </view>
-        <view class="bento-card card-beauty" bindtap="onCategoryClick" data-type="beauty">
-          <view class="bento-text">
-            <text class="bento-title beauty-title">美妆个护</text>
-            <text class="bento-sub beauty-sub">美颜焕肤</text>
-          </view>
-          <image class="bento-icon" src="/images/discover/DHVjm.png"></image>
-        </view>
+
+
+    <!-- Centered Feed Platform Switch (Flat Tabs) -->
+    <view class="feed-tabs-container">
+      <view class="feed-tab {{feedPlatform === 'tb' ? 'active' : ''}}" bindtap="switchFeedPlatform" data-p="tb">
+        <text>淘喜商品</text>
+        <view class="tab-indicator" wx:if="{{feedPlatform === 'tb'}}"></view>
       </view>
-      <view class="bento-row">
-        <view class="bento-card card-toy" bindtap="onCategoryClick" data-type="toy">
-          <view class="bento-text">
-            <text class="bento-title toy-title">母婴玩具</text>
-            <text class="bento-sub toy-sub">宝妈优选</text>
-          </view>
-          <image class="bento-icon" src="/images/discover/87POl.png"></image>
-        </view>
-        <view class="bento-card card-dress" bindtap="onCategoryClick" data-type="dress">
-          <view class="bento-text">
-            <text class="bento-title dress-title">女装精选</text>
-            <text class="bento-sub dress-sub">换季衣橱</text>
-          </view>
-          <image class="bento-icon" src="/images/discover/bisH4.png"></image>
-        </view>
+      <view class="feed-tab {{feedPlatform === 'jd' ? 'active' : ''}}" bindtap="switchFeedPlatform" data-p="jd">
+        <text>京喜商品</text>
+        <view class="tab-indicator" wx:if="{{feedPlatform === 'jd'}}"></view>
       </view>
     </view>
 
-    <!-- 商品瀑布流列表 -->
-    <view class="waterfall">
-      <!-- 左列 -->
-      <view class="column">
-        <view
-          class="goods-card"
-          wx:for="{{leftList}}"
-          wx:key="id"
-          bindtap="onGoodsClick"
-          data-id="{{item._id || item.id}}"
-        >
-          <view class="goods-img-wrap">
-            <image class="goods-img" src="{{item.image}}" mode="widthFix"></image>
-            <view class="play-overlay" wx:if="{{item.video}}"><text class="play-icon">▶</text></view>
-            <view class="discount-badge" wx:if="{{item.badge}}">{{item.badge}}</view>
+    <!-- Product Waterfall (Masonry) -->
+    <block wx:if="{{!isLoading}}">
+      <view class="waterfall-grid">
+        <view class="product-card" wx:for="{{products}}" wx:key="tao_id" bindtap="goToDetail" data-item="{{item}}" hover-class="opacity-90 scale-98" style="transition: transform 0.2s">
+          <view class="image-wrapper">
+            <image src="{{item.image_url}}" mode="widthFix" class="product-image" lazy-load="{{true}}" />
+            <view class="platform-tag" style="background-color: {{themeColor || '#FF6200'}};">
+              {{item.platform === 'taobao' ? '淘宝' : '京东'}}
+            </view>
           </view>
-          <view class="goods-info">
-            <view class="goods-title">{{item.title}}</view>
-            <view class="goods-footer">
-              <view class="price-area">
-                <view class="goods-price">¥{{item.price}}</view>
-                <view style="font-size:22rpx; color:#999; text-decoration:line-through; margin-left:8rpx;">¥{{item.originalPrice}}</view>
+          <view class="product-info">
+            <view class="product-title line-clamp-2">{{item.title}}</view>
+            <view class="price-section">
+              <view class="coupon-tag" style="background-color: {{themeColor ? themeColor+'1A' : 'rgba(255,98,0,0.05)'}}; border-color: {{themeColor ? themeColor+'4D' : 'rgba(255,98,0,0.3)'}};" wx:if="{{item.coupon_amount > 0}}">
+                <text class="coupon-txt" style="color: {{themeColor || '#FF6200'}};">券</text>
+                <text class="coupon-val" style="color: {{themeColor || '#FF6200'}};">¥{{item.coupon_amount}}</text>
               </view>
-              <view class="goods-points">约得 {{item.points}} 积分</view>
+              <view class="price-row">
+                <view class="final-price" style="color: {{themeColor || '#FF6200'}};">
+                  <text class="price-symbol">¥</text>
+                  <text class="price-num">{{item.coupon_price}}</text>
+                </view>
+                <text class="original-price" wx:if="{{item.original_price > item.coupon_price}}">¥{{item.original_price}}</text>
+              </view>
+              <view class="sales-row">
+                <text class="sales-text">已售 {{item.sales_num}}</text>
+                <view class="buy-btn" style="color: {{themeColor || '#FF6200'}};">领券抢购 ></view>
+              </view>
             </view>
           </view>
         </view>
       </view>
-
-      <!-- 右列 -->
-      <view class="column">
-        <view
-          class="goods-card"
-          wx:for="{{rightList}}"
-          wx:key="id"
-          bindtap="onGoodsClick"
-          data-id="{{item._id || item.id}}"
-        >
-          <view class="goods-img-wrap">
-            <image class="goods-img" src="{{item.image}}" mode="widthFix"></image>
-            <view class="play-overlay" wx:if="{{item.video}}"><text class="play-icon">▶</text></view>
-            <view class="discount-badge" wx:if="{{item.badge}}">{{item.badge}}</view>
-          </view>
-          <view class="goods-info">
-            <view class="goods-title">{{item.title}}</view>
-            <view class="goods-footer">
-              <view class="price-area">
-                <view class="goods-price">¥{{item.price}}</view>
-                <view style="font-size:22rpx; color:#999; text-decoration:line-through; margin-left:8rpx;">¥{{item.originalPrice}}</view>
-              </view>
-              <view class="goods-points">约得 {{item.points}} 积分</view>
+    </block>
+    <block wx:else>
+      <!-- Skeleton Waterfall -->
+      <view class="waterfall-grid">
+        <view class="product-card" wx:for="{{[1,2,3,4]}}" wx:key="*this">
+          <view class="skeleton-block" style="height: 340rpx; border-radius: 0;"></view>
+          <view class="product-info" style="padding-top: 24rpx;">
+            <view class="skeleton-block" style="width: 100%; height: 28rpx; margin-bottom: 12rpx;"></view>
+            <view class="skeleton-block" style="width: 70%; height: 28rpx; margin-bottom: 24rpx;"></view>
+            <view class="skeleton-block" style="width: 80rpx; height: 32rpx; margin-bottom: 16rpx; border-radius: 8rpx;"></view>
+            <view style="display: flex; justify-content: space-between;">
+              <view class="skeleton-block" style="width: 120rpx; height: 36rpx;"></view>
+              <view class="skeleton-block" style="width: 80rpx; height: 24rpx;"></view>
             </view>
           </view>
         </view>
       </view>
-    </view>
-    
-    <!-- 防遮挡占位垫(适配底部原生tabBar高度及安全区) -->
-    <view class="safe-area-spacer" style="height: 100rpx; padding-bottom: env(safe-area-inset-bottom);"></view>
-  </scroll-view>
+    </block>
 
-  <!-- 商品详情承接弹窗 (Popup) -->
-  <view class="detail-popup-wrap" wx:if="{{showDetailPopup}}">
-    <view class="detail-overlay" catchtap="closePopup"></view>
-    <view class="detail-sheet">
-      <view class="sheet-header">
-        <text class="close-btn" catchtap="closePopup">✕</text>
-      </view>
-      <image class="sheet-img" src="{{selectedGoods.image}}" mode="aspectFill"></image>
-      <view class="sheet-title">{{selectedGoods.title}}</view>
-      <view class="sheet-points">约得 {{selectedGoods.points}} 积分</view>
-      <view class="sheet-price-row">
-        <text class="sheet-price">¥{{selectedGoods.price}}</text>
-        <text class="sheet-original-price" wx:if="{{selectedGoods.originalPrice}}">¥{{selectedGoods.originalPrice}}</text>
-      </view>
-      <view class="buy-btn" catchtap="onBuyClick">去官方平台领券并购买</view>
+    <!-- Bottom Loading Indicators -->
+    <view class="flex justify-center items-center py-6" wx:if="{{isLoadingMore}}">
+      <text class="text-xs text-gray-400">正在加载更多...</text>
     </view>
-  </view>
-  <!-- 淘口令领券专属弹窗 -->
-  <view class="tkl-popup-wrap" wx:if="{{showTklPopup}}">
-    <view class="tkl-overlay" catchtap="closeTklPopup"></view>
-    <view class="tkl-box">
-      <view class="tkl-header">专属补贴已备好</view>
-      <view class="tkl-body">
-        <view class="tkl-desc">已为您生成极速补贴链接/口令：</view>
-        <text class="tkl-code" user-select="true">{{generatedTkl}}</text>
-        <view class="tkl-notice">【注意】由于平台策略，请您点击“立刻复制”后，直接打开手机淘宝的顶部搜索框进行粘贴。</view>
-      </view>
-      <view class="tkl-footer">
-        <view class="tkl-btn tkl-cancel" bindtap="closeTklPopup">取消</view>
-        <view class="tkl-btn tkl-confirm" bindtap="onCopyTkl">立刻复制</view>
-      </view>
+    <view class="flex justify-center items-center py-6" wx:if="{{!hasMore && products.length > 0}}">
+      <text class="text-xs text-gray-300">已经到底啦~</text>
     </view>
+
   </view>
 </view>

@@ -2,6 +2,7 @@ import { RouterProvider } from "react-router";
 import { ConfigProvider } from "antd";
 import zhCN from "antd/locale/zh_CN";
 import { router } from "./routes";
+import { Toaster } from "./components/ui/sonner";
 import "./styles/antd-custom.css";
 
 function App() {
@@ -51,6 +52,7 @@ function App() {
       }}
     >
       <RouterProvider router={router} />
+      <Toaster position="bottom-right" />
     </ConfigProvider>
   );
 }

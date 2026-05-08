@@ -1,0 +1,55 @@
+<view class="promo-container pb-safe">
+  <!-- Header Image / Banner Placeholder -->
+  <view class="promo-header">
+    <view class="promo-title-area">
+      <text class="promo-title">{{pageTitle}}</text>
+      <text class="promo-subtitle">为您精选超值好物</text>
+    </view>
+  </view>
+
+  <!-- Feed Content -->
+  <view class="feed-container">
+    <view class="rank-list" wx:if="{{!isLoading && items.length > 0}}">
+      <view class="list-item" wx:for="{{items}}" wx:key="id" bindtap="goToDetail" data-id="{{item.id}}">
+        
+        <view class="item-img-wrapper">
+          <image src="{{item.image}}" mode="aspectFill" class="item-img" lazy-load></image>
+          <view class="platform-tag" style="background: linear-gradient(90deg, #FF8C00, #FF6200);">
+            {{item.platform === 'tb' ? '淘宝' : '京东'}}
+          </view>
+        </view>
+
+        <view class="item-info">
+          <text class="item-title">{{item.title}}</text>
+          
+          <view class="item-coupon-row">
+            <view class="coupon-tag">
+              <text class="coupon-txt">券</text>
+              <text class="coupon-val">{{item.coupon}}元</text>
+            </view>
+            <text class="item-sales">已售 {{item.sales}}</text>
+          </view>
+
+          <view class="item-price-row">
+            <view class="price-group">
+              <text class="price-prefix">券后 ¥</text>
+              <text class="price-current">{{item.price}}</text>
+              <text class="price-original">¥{{item.originalPrice}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- Loading State -->
+    <view class="loading-state" wx:if="{{isLoading}}">
+      <view class="spinner"></view>
+      <text class="loading-text">正在加载精彩内容...</text>
+    </view>
+
+    <!-- Empty State -->
+    <view class="empty-state" wx:if="{{!isLoading && items.length === 0}}">
+      <text class="empty-text">暂无数据</text>
+    </view>
+  </view>
+</view>

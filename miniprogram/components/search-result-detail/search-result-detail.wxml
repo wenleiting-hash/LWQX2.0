@@ -1,0 +1,37 @@
+<!-- components/search-result-detail/search-result-detail.wxml -->
+<view class="result-card bg-white relative fade-zoom-in" wx:if="{{product}}">
+  <view class="flex content-row">
+    <!-- 商品图 -->
+    <view class="img-wrap flex-shrink-0 bg-gray-50">
+      <image class="w-full h-full object-cover" src="{{product.image}}" mode="aspectFill"></image>
+    </view>
+    
+    <!-- 信息区 -->
+    <view class="flex-1 flex flex-col justify-between info-col">
+      <!-- 摘要标题 -->
+      <view class="title-text line-clamp-2">
+        {{product.title}}
+      </view>
+
+      <view class="price-section flex flex-col justify-end">
+        <!-- 价格 -->
+        <view class="flex items-baseline price-row">
+          <text class="price-current">¥{{product.couponPrice}}</text>
+          <text class="price-origin">¥{{product.originalPrice}}</text>
+        </view>
+        
+        <!-- 优惠 -->
+        <view class="flex items-center mt-1">
+          <view class="save-chip flex items-center justify-center">
+            为您省下 ¥{{product.originalPrice - product.couponPrice}}
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <button class="buy-btn w-full text-white flex items-center justify-center" bindtap="handleCopyLink">
+    立即领券购买
+  </button>
+</view>
+

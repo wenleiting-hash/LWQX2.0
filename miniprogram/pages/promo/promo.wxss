@@ -1,0 +1,193 @@
+.promo-container {
+  min-height: 100vh;
+  background-color: #F5F5F5;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header */
+.promo-header {
+  height: 300rpx;
+  background: linear-gradient(135deg, #FF6200, #FF8C00);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom-left-radius: 40rpx;
+  border-bottom-right-radius: 40rpx;
+  position: relative;
+  overflow: hidden;
+}
+
+.promo-title-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 2;
+}
+
+.promo-title {
+  color: #FFFFFF;
+  font-size: 48rpx;
+  font-weight: bold;
+  margin-bottom: 12rpx;
+}
+
+.promo-subtitle {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 28rpx;
+}
+
+/* Feed Content */
+.feed-container {
+  padding: 32rpx;
+  margin-top: -60rpx;
+}
+
+.rank-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+
+/* Reused list styles from rankings page */
+.list-item {
+  background-color: #FFFFFF;
+  border-radius: 8rpx;
+  padding: 24rpx;
+  display: flex;
+  gap: 20rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.02);
+}
+
+.item-img-wrapper {
+  width: 200rpx;
+  height: 200rpx;
+  border-radius: 8rpx;
+  position: relative;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.item-img {
+  width: 100%;
+  height: 100%;
+}
+
+.platform-tag {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  font-size: 18rpx;
+  padding: 2rpx 8rpx;
+  border-top-left-radius: 8rpx;
+  color: #FFFFFF;
+}
+
+.item-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.item-title {
+  font-size: 28rpx;
+  color: #333333;
+  line-height: 1.4;
+  font-weight: 500;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+.item-coupon-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16rpx;
+}
+
+.coupon-tag {
+  display: flex;
+  align-items: center;
+  height: 36rpx;
+  background: rgba(255, 98, 0, 0.1);
+  border: 2rpx solid #FF6200;
+  border-radius: 8rpx;
+  overflow: hidden;
+}
+
+.coupon-txt {
+  background: #FF6200;
+  color: #FFF;
+  font-size: 20rpx;
+  padding: 0 8rpx;
+  line-height: 36rpx;
+}
+
+.coupon-val {
+  color: #FF6200;
+  font-size: 22rpx;
+  padding: 0 8rpx;
+  line-height: 36rpx;
+  font-weight: bold;
+}
+
+.item-sales {
+  font-size: 22rpx;
+  color: #999999;
+}
+
+.item-price-row {
+  margin-top: auto;
+  display: flex;
+  align-items: baseline;
+}
+
+.price-prefix {
+  font-size: 22rpx;
+  color: #FF6200;
+}
+
+.price-current {
+  font-size: 36rpx;
+  color: #FF6200;
+  font-weight: bold;
+  margin-left: 4rpx;
+}
+
+.price-original {
+  font-size: 22rpx;
+  color: #999999;
+  text-decoration: line-through;
+  margin-left: 12rpx;
+}
+
+/* Loading & Empty States */
+.loading-state, .empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 100rpx 0;
+}
+
+.spinner {
+  width: 60rpx;
+  height: 60rpx;
+  border: 6rpx solid #f3f3f3;
+  border-top: 6rpx solid #FF6200;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20rpx;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-text, .empty-text {
+  font-size: 28rpx;
+  color: #999999;
+}

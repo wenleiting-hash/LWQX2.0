@@ -1,14 +1,116 @@
 const cloud = require('wx-server-sdk');
+const crypto = require('crypto');
 
 // 初始化云环境 (DYNAMIC_CURRENT_ENV 自动匹配当前环境)
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 const db = cloud.database();
 const _ = db.command;
 
+// ==========================================
+// Token 验证中间件
+// ==========================================
+async function verifyToken(token) {
+  if (!token) return null;
+
+  try {
+    const parts = token.split('.');
+    if (parts.length !== 3) return null;
+
+    const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString());
+    const now = Date.now();
+
+    // 检查 token 是否过期
+    if (payload.exp && payload.exp < now) {
+      return null;
+    }
+
+    // 验证签名
+    const secret = 'lwqx_admin_secret_key_2024';
+    const expectedSignature = crypto.createHmac('sha256', secret)
+      .update(`${parts[0]}.${parts[1]}`)
+      .digest('base64')
+      .replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+      
+    if (parts[2] !== expectedSignature) {
+      return null;
+    }
+
+    // 验证数据库中的 token 是否有效
+    const user = await db.collection('30_users').doc(payload.uid).get();
+    if (!user.data || user.data.valid_token !== token) {
+      return null;
+    }
+
+    return user.data;
+  } catch (e) {
+    console.error('[Token Verify Error]', e);
+    return null;
+  }
+}
+
+// 需要验证 token 的 actions 列表
+const TOKEN_REQUIRED_ACTIONS = new Set([
+  'get_dashboard',
+  'get_orders',
+  'get_search_logs',
+  'get_manage_config',
+  'update_manage_config',
+  'get_operations_config',
+  'update_operations_config',
+  'get_doc',
+  'update_doc',
+  'get_cron_tasks',
+  'get_cron_logs',
+  'run_cron_task',
+  'backfill_stats',
+  'get_admin_users',
+  'add_admin_user',
+  'update_admin_user',
+  'delete_admin_user'
+]);
+
+// ==========================================
+// 操作日志记录
+// ==========================================
+async function logOperation(action, adminUser, payload = {}) {
+  try {
+    await db.collection('30_admin_logs').add({
+      data: {
+        action: action,
+        admin_id: adminUser._id,
+        admin_name: adminUser.username,
+        payload: JSON.stringify(payload),
+        created_at: db.serverDate(),
+        ip: payload.ip || 'unknown'
+      }
+    });
+  } catch (e) {
+    if (e.message && e.message.includes('not exist')) {
+      try {
+        await db.createCollection('30_admin_logs');
+        await db.collection('30_admin_logs').add({
+          data: {
+            action: action,
+            admin_id: adminUser._id,
+            admin_name: adminUser.username,
+            payload: JSON.stringify(payload),
+            created_at: db.serverDate(),
+            ip: payload.ip || 'unknown'
+          }
+        });
+      } catch (err) {
+        console.error('[Log Operation Create Error]', err);
+      }
+    } else {
+      console.error('[Log Operation Error]', e);
+    }
+  }
+}
+
 exports.main = async (event, context) => {
   // 1. 兼容性解析：处理 HTTP 网关触发 vs 微信原生调用的参数差异
   let params = event;
-  if (event.httpMethod) { 
+  if (event.httpMethod) {
     try {
       // 通过 API 网关 POST 过来的 JSON 数据通常在 event.body 中，且为字符串
       params = typeof event.body === 'string' ? JSON.parse(event.body) : event.body;
@@ -17,24 +119,51 @@ exports.main = async (event, context) => {
     }
   }
 
-  const { action, ...payload } = params;
+  const { action, token, ...payload } = params;
 
-  // 2. 路由分发中心
+  // 2. Token 验证（登录接口除外）
+  let adminUser = null;
+  if (action !== 'login') {
+    if (!token) {
+      return { code: 401, msg: "未提供认证令牌" };
+    }
+    adminUser = await verifyToken(token);
+    if (!adminUser) {
+      return { code: 401, msg: "认证令牌无效或已过期" };
+    }
+
+    // 记录操作日志（排除查询类操作）
+    if (TOKEN_REQUIRED_ACTIONS.has(action) && !action.startsWith('get_')) {
+      await logOperation(action, adminUser, payload);
+    }
+  }
+
+  // 3. 路由分发中心
   try {
     switch (action) {
       case 'login':
         return await handleLogin(payload);
+      // --- 管理员用户管理模块 ---
+      case 'get_admin_users':
+        return await getAdminUsers(payload);
+      case 'add_admin_user':
+        return await addAdminUser(payload);
+      case 'update_admin_user':
+        return await updateAdminUser(payload);
+      case 'delete_admin_user':
+        return await deleteAdminUser(payload);
       case 'get_dashboard':
         return await getDashboard(payload);
       case 'get_orders':
         return await getOrders(payload);
-      case 'get_users':
-        return await getUsers(payload);
-      case 'toggle_user_status':
-        return await toggleUserStatus(payload);
+      // --- 查券管理模块 ---
+      case 'get_search_logs':
+        return await getSearchLogs(payload);
+      case 'get_bulletin_logs':
+        return await getBulletinLogs(payload);
       // --- 系统设置模块 ---
       case 'get_manage_config':
-        return await getManageConfig();
+        return await getManageConfig(payload);
       case 'update_manage_config':
         return await updateManageConfig(payload);
       // --- 运营配置模块 ---
@@ -42,17 +171,7 @@ exports.main = async (event, context) => {
         return await getOperationsConfig();
       case 'update_operations_config':
         return await updateOperationsConfig(payload);
-      // --- 积分规则模块 ---
-      case 'get_points_rules':
-        return await getPointsRules(payload);
-      case 'get_points_rule':
-        return await getPointsRule(payload);
-      case 'create_points_rule':
-        return await createPointsRule(payload);
-      case 'update_points_rule':
-        return await updatePointsRule(payload);
-      case 'delete_points_rule':
-        return await deletePointsRule(payload);
+      // --- 积分规则模块 (已废弃) ---
       // --- 系统说明书模块 ---
       case 'get_doc':
         return await getDoc();
@@ -60,11 +179,17 @@ exports.main = async (event, context) => {
         return await updateDoc(payload);
       // --- 定时任务模块 ---
       case 'get_cron_tasks':
-        return await getCronTasks();
+        return await getCronTasks(payload);
       case 'get_cron_logs':
         return await getCronLogs(payload);
       case 'run_cron_task':
         return await runCronTask(payload);
+      // --- 临时数据聚合 ---
+      case 'backfill_stats':
+        return await backfillStats(payload);
+      // --- 操作日志 ---
+      case 'get_operation_logs':
+        return await getOperationLogs(payload);
       default:
         return { code: 404, msg: `未知动作指令: ${action}` };
     }
@@ -75,28 +200,150 @@ exports.main = async (event, context) => {
 };
 
 // ==========================================
-// 模块 1: 超级管理员登录校验
+// 模块 1: 超级管理员登录校验 (含自动初始化)
 // ==========================================
 async function handleLogin({ username, password }) {
   if (!username || !password) return { code: 400, msg: "账号密码不能为空" };
 
-  const res = await db.collection('admin_users').where({ username, password }).get();
-  
+  // 自动初始化: 检查超级管理员是否已存在于数据库
+  const superCheck = await db.collection('30_users').where({ username: 'Superuser' }).get();
+  if (superCheck.data.length === 0) {
+    // 首次启动系统，自动写入内置超级管理员
+    await db.collection('30_users').add({
+      data: {
+        username: 'Superuser',
+        password: 'password',
+        role: 'superuser',
+        created_at: db.serverDate(),
+        last_login_time: null
+      }
+    });
+    console.log('[Admin API] 超级管理员 Superuser 自动初始化完成');
+  }
+
+  // 兼容历史账号 SuperAdmin（仅当账号存在且没有 password 字段时才添加）
+  const superAdminCheck = await db.collection('30_users').where({ username: 'SuperAdmin' }).get();
+  if (superAdminCheck.data.length > 0) {
+    const superAdmin = superAdminCheck.data[0];
+    if (!superAdmin.password) {
+      await db.collection('30_users').doc(superAdmin._id).update({
+        data: { password: 'password' }
+      });
+      console.log('[Admin API] 历史账号 SuperAdmin 已添加密码字段');
+    }
+  }
+
+  const res = await db.collection('30_users').where({ username, password }).get();
+
   if (res.data.length > 0) {
     const admin = res.data[0];
     // 更新最后登录时间
-    await db.collection('admin_users').doc(admin._id).update({
+    await db.collection('30_users').doc(admin._id).update({
       data: { last_login_time: db.serverDate() }
     });
-    // 返回模拟 Token (实际生产可换成 JWT)
-    return { 
-      code: 200, 
-      msg: "登录成功", 
-      data: { token: `token_${new Date().getTime()}_${admin._id}`, username: admin.username } 
+
+    // 生成简单的 JWT-like token（包含用户ID和过期时间）
+    const now = Date.now();
+    const expireAt = now + 7 * 24 * 60 * 60 * 1000; // 7天有效期
+    const tokenData = {
+      uid: admin._id,
+      username: admin.username,
+      role: admin.role || 'admin',
+      exp: expireAt
+    };
+
+    // 使用 Base64 编码生成 token（生产环境建议使用真正的 JWT 库）
+    const tokenHeader = Buffer.from(JSON.stringify({ alg: 'HS256', typ: 'JWT' })).toString('base64');
+    const tokenPayload = Buffer.from(JSON.stringify(tokenData)).toString('base64');
+    // 使用 HMAC 生成真实的签名
+    const secret = 'lwqx_admin_secret_key_2024';
+    const signature = crypto.createHmac('sha256', secret)
+      .update(`${tokenHeader}.${tokenPayload}`)
+      .digest('base64')
+      .replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+
+    const token = `${tokenHeader}.${tokenPayload}.${signature}`;
+
+    // 存储有效 token 到数据库用于验证
+    await db.collection('30_users').doc(admin._id).update({
+      data: {
+        valid_token: token,
+        token_expire_at: expireAt
+      }
+    });
+
+    return {
+      code: 200,
+      msg: "登录成功",
+      data: {
+        token: token,
+        username: admin.username,
+        role: admin.role || 'admin'
+      } 
     };
   } else {
     return { code: 401, msg: "账号或密码错误" };
   }
+}
+
+// ==========================================
+// 模块 1.1: 管理员用户 CRUD
+// ==========================================
+async function getAdminUsers() {
+  const res = await db.collection('30_users')
+    .orderBy('created_at', 'desc')
+    .get();
+  // 脱敏: 不返回密码明文
+  const list = res.data.map(u => ({
+    _id: u._id,
+    username: u.username,
+    role: u.role || 'admin',
+    created_at: u.created_at,
+    last_login_time: u.last_login_time
+  }));
+  return { code: 200, data: { list, total: list.length } };
+}
+
+async function addAdminUser({ data }) {
+  if (!data || !data.username || !data.password) {
+    return { code: 400, msg: "用户名和密码不能为空" };
+  }
+  // 检查用户名是否已存在
+  const existing = await db.collection('30_users').where({ username: data.username }).get();
+  if (existing.data.length > 0) {
+    return { code: 400, msg: "该用户名已存在" };
+  }
+  await db.collection('30_users').add({
+    data: {
+      username: data.username,
+      password: data.password,
+      role: data.role || 'admin',
+      created_at: db.serverDate(),
+      last_login_time: null
+    }
+  });
+  return { code: 200, msg: "管理员创建成功" };
+}
+
+async function updateAdminUser({ id, data }) {
+  if (!id || !data) return { code: 400, msg: "参数不完整" };
+  const updateData = {};
+  if (data.password) updateData.password = data.password;
+  if (data.role) updateData.role = data.role;
+  // 不允许修改 username
+  await db.collection('30_users').doc(id).update({ data: updateData });
+  return { code: 200, msg: "管理员信息更新成功" };
+}
+
+async function deleteAdminUser({ id }) {
+  if (!id) return { code: 400, msg: "缺少用户 ID" };
+  // 安全拦截: 不允许删除超级管理员
+  const user = await db.collection('30_users').doc(id).get();
+  if (user.data && user.data.username === 'Superuser') {
+    return { code: 403, msg: "超级管理员不允许删除" };
+  }
+  await db.collection('30_users').doc(id).remove();
+  return { code: 200, msg: "管理员已删除" };
 }
 
 // ==========================================
@@ -110,26 +357,30 @@ async function getDashboard() {
   const monthStart = new Date(bjNow.getUTCFullYear(), bjNow.getUTCMonth(), 1);
   const lastMonthStart = new Date(bjNow.getUTCFullYear(), bjNow.getUTCMonth() - 1, 1);
   
-  // 1. 并发获取各项核心指标
-  const [
-    totalUsers, 
-    todayUsers, 
-    totalOrders, 
-    todayOrdersRes,
-    realtimeOrders,
-    monthStatsRes,
-    lastMonthStatsRes,
-    monthTrendRes
-  ] = await Promise.all([
-    db.collection('users').count(),
-    db.collection('users').where({ created_at: _.gte(new Date(now.setHours(0,0,0,0))) }).count(),
-    db.collection('tk_orders').count(),
-    db.collection('tk_orders').where({ createTime: _.gte(todayStr), status: _.neq('invalid') }).get(), // 今日实时订单
-    db.collection('tk_orders').orderBy('createTime', 'desc').limit(10).get(), // 实时订单流
-    db.collection('daily_stats').where({ _id: _.gte(dayFormat(monthStart)) }).get(), // 本月流水
-    db.collection('daily_stats').where({ _id: _.and(_.gte(dayFormat(lastMonthStart)), _.lt(dayFormat(monthStart))) }).get(), // 上月流水
-    db.collection('daily_stats').orderBy('_id', 'asc').limit(30).get() // 30天趋势
+  // 2. 并发获取各项核心指标，使用 Promise.allSettled 防止未建表导致整个大盘崩溃
+  const results = await Promise.allSettled([
+    db.collection('30_members').count(),
+    // 注意：30_members 历史数据可能使用 createTime 或 created_at，这里使用 createTime 兼容
+    db.collection('30_members').where({ createTime: _.gte(new Date(now.setHours(0,0,0,0))) }).count(),
+    db.collection('30_orders').count(),
+    db.collection('30_orders').where({ createTime: _.gte(todayStr), status: _.neq('invalid') }).get(),
+    db.collection('30_orders').orderBy('createTime', 'desc').limit(10).get(),
+    db.collection('30_daily_stats').where({ _id: _.gte(dayFormat(monthStart)) }).get(),
+    db.collection('30_daily_stats').where({ _id: _.and(_.gte(dayFormat(lastMonthStart)), _.lt(dayFormat(monthStart))) }).get(),
+    db.collection('30_daily_stats').orderBy('_id', 'desc').limit(30).get()
   ]);
+
+  // 辅助函数：从 allSettled 结果中安全提取数据
+  const safeResult = (result, defaultVal) => result.status === 'fulfilled' ? result.value : defaultVal;
+
+  const totalUsers = safeResult(results[0], { total: 0 });
+  const todayUsers = safeResult(results[1], { total: 0 });
+  const totalOrders = safeResult(results[2], { total: 0 });
+  const todayOrdersRes = safeResult(results[3], { data: [] });
+  const realtimeOrders = safeResult(results[4], { data: [] });
+  const monthStatsRes = safeResult(results[5], { data: [] });
+  const lastMonthStatsRes = safeResult(results[6], { data: [] });
+  const monthTrendRes = safeResult(results[7], { data: [] });
 
   // 计算今日实时佣金
   const todayCommission = todayOrdersRes.data.reduce((acc, cur) => acc + (cur.commission || 0), 0);
@@ -162,16 +413,33 @@ async function getDashboard() {
     code: 200,
     data: {
       stats,
-      monthTrend: monthTrendRes.data,
+      // 必须返回平铺字段，兼容前端 Dashboard.tsx 的取值逻辑
+      totalUsers: totalUsers.total,
+      todayNewUsers: todayUsers.total,
+      todayOrders: todayOrdersRes.data.length,
+      todayCommission: todayCommission,
+      monthCommission: currentMonthCommission,
+      // 其他图表数据，注意按日期升序排列以便图表从左到右显示
+      // 数据库返回的是按 _id(日期) 降序排列的最新30条记录，所以这里需要 .reverse()
+      monthTrend: [...monthTrendRes.data].reverse().map(item => ({
+        date: item._id ? item._id.substring(5) : "",
+        amount: item.amount || 0,
+        orders: item.count || 0
+      })),
       realtimeOrders: realtimeOrders.data.map(o => {
-        const timeStr = o.createTime ? (o.createTime.includes(' ') ? o.createTime.split(' ')[1].substring(0, 5) : "--:--") : "--:--";
+        const rawTime = o.createTime || o.create_time;
+        // 原格式：2026-04-04 18:45:07 -> 目标格式：2026.04.04 18:45
+        const timeStr = rawTime ? rawTime.substring(0, 16).replace(/-/g, '.') : "--:--";
         return {
           time: timeStr,
           user: maskNickname(o._openid || "匿名用户"),
           amount: (o.commission || 0).toFixed(2)
         };
       }),
-      orderTrend: monthTrendRes.data.map(d => ({ date: d.date, count: d.count || 0 })), 
+      orderTrend: [...monthTrendRes.data].reverse().map(item => ({ 
+        date: item._id ? item._id.substring(5) : "", 
+        count: item.count || 0 
+      })), 
       businessMetrics
     }
   };
@@ -197,7 +465,7 @@ function maskNickname(str) {
 // ==========================================
 // 模块 3: 对账中心 (带分页、搜索、排序)
 // ==========================================
-async function getOrders({ page = 1, pageSize = 10, orderId = '', status = '', keyword = '' }) {
+async function getOrders({ page = 1, pageSize = 10, orderId = '', status = '', keyword = '', platform = '' }) {
   let query = {};
   
   // 兼顾多种搜索参数
@@ -213,8 +481,12 @@ async function getOrders({ page = 1, pageSize = 10, orderId = '', status = '', k
   if (status && status !== 'all') {
     query.status = status;
   }
+  
+  if (platform) {
+    query.platform = platform;
+  }
 
-  const collection = db.collection('tk_orders');
+  const collection = db.collection('30_orders');
   const totalRes = await collection.where(query).count();
   const listRes = await collection.where(query)
     .orderBy('createTime', 'desc')
@@ -280,148 +552,171 @@ async function getOrders({ page = 1, pageSize = 10, orderId = '', status = '', k
 }
 
 // ==========================================
-// 模块 4: 用户资产列表 (带分页、搜索)
+// 模块 5.1: 查券行为日志管理
 // ==========================================
-// ==========================================
-// 模块 4: 用户资产列表 (带分页、搜索、积分聚合)
-// ==========================================
-async function getUsers({ page = 1, pageSize = 10, keyword = '' }) {
+async function getBulletinLogs({ page = 1, pageSize = 10, platform = '' }) {
   let query = {};
-  if (keyword) {
-    query = _.or([
-      { _openid: db.RegExp({ regexp: keyword, options: 'i' }) },
-      { nickname: db.RegExp({ regexp: keyword, options: 'i' }) },
-      { nickName: db.RegExp({ regexp: keyword, options: 'i' }) }
-    ]);
+  if (platform) {
+    query.platform = platform;
   }
 
-  const totalRes = await db.collection('users').where(query).count();
-  const listRes = await db.collection('users').where(query)
-    .orderBy('createTime', 'desc')
+  const totalRes = await db.collection('bulletin_logs').where(query).count();
+  const listRes = await db.collection('bulletin_logs')
+    .where(query)
+    .orderBy('event_timestamp', 'desc')
     .skip((page - 1) * pageSize)
     .limit(pageSize)
     .get();
 
-  const users = listRes.data;
-  if (users.length === 0) return { code: 200, data: { list: [], total: 0 } };
-
-  const openids = users.map(u => u._openid);
-
-  // 聚合积分数据
-  const $ = db.command.aggregate;
-  const pointsRes = await db.collection('tk_orders').aggregate()
-    .match({
-      _openid: _.in(openids)
-    })
-    .group({
-      _id: '$_openid',
-      settled: $.sum($.cond({
-        if: $.eq(['$status', 'settled']),
-        then: '$points',
-        else: 0
-      })),
-      pending: $.sum($.cond({
-        if: $.eq(['$status', 'pending']),
-        then: '$points',
-        else: 0
-      }))
-    })
-    .end();
-
-  const pointsMap = {};
-  pointsRes.list.forEach(item => {
-    pointsMap[item._id] = item;
-  });
-
-  const list = users.map(u => {
-    const p = pointsMap[u._openid] || { settled: 0, pending: 0 };
-    return {
-      ...u,
-      _openid: u._openid || u.openid || u._id,
-      nickname: u.nickname || u.nickName || "小程序用户",
-      totalPoints: Number(((p.settled || 0) + (p.pending || 0)).toFixed(2)),
-      availablePoints: Number((p.settled || 0).toFixed(2)),
-      frozenPoints: Number((p.pending || 0).toFixed(2)),
-      status: u.status !== undefined ? u.status : 1, // 默认 1 (正常)
-      registerTime: u.createTime || u.created_at || u._createTime || "",
-      lastActiveTime: u.updateTime || u.updated_at || u._updateTime || u.createTime || u.created_at || ""
-    };
-  });
-
-  return { code: 200, data: { list, total: totalRes.total } };
+  return {
+    code: 200,
+    data: {
+      list: listRes.data,
+      total: totalRes.total,
+      page,
+      pageSize
+    }
+  };
 }
 
 // ==========================================
-// 模块 5: 核心风控 - 一键冻结/解冻用户
+// 模块 5.2: 真实查券行为日志查询 (30_search_logs)
 // ==========================================
-async function toggleUserStatus({ openid, status }) {
-  if (!openid || status === undefined) return { code: 400, msg: "参数不完整" };
+async function getSearchLogs({ page = 1, pageSize = 10, platform = '' }) {
+  let query = {};
+  if (platform) {
+    query.platform = platform;
+  }
 
-  await db.collection('users').where({ _openid: openid }).update({
-    data: { 
-      status: status,
-      updateTime: db.serverDate()
-    }
-  });
+  try {
+    const totalRes = await db.collection('30_search_queries').where(query).count();
+    const listRes = await db.collection('30_search_queries')
+      .where(query)
+      .orderBy('event_timestamp', 'desc')
+      .skip((page - 1) * pageSize)
+      .limit(pageSize)
+      .get();
 
-  return { code: 200, msg: status === 1 ? "账号已解冻" : "账号已冻结数据已同步" };
+    const fixedList = listRes.data.map(item => {
+      // 修复历史遗留的脏数据：如果原价等于券后价，且存在优惠券，则真正的原价应该是券后价+优惠券金额
+      if (item.originalPrice && item.finalPrice && item.couponAmount > 0) {
+        if (Number(item.originalPrice) === Number(item.finalPrice)) {
+          item.originalPrice = Number((Number(item.finalPrice) + Number(item.couponAmount)).toFixed(2));
+        }
+      }
+      return item;
+    });
+
+    return {
+      code: 200,
+      data: {
+        list: fixedList,
+        total: totalRes.total,
+        page,
+        pageSize
+      }
+    };
+  } catch (e) {
+    // 集合不存在时返回空数据
+    return {
+      code: 200,
+      data: {
+        list: [],
+        total: 0,
+        page,
+        pageSize
+      }
+    };
+  }
 }
 
 // ==================== [4] 系统设置 ====================
-async function getManageConfig() {
+async function getManageConfig(payload) {
+  const configId = payload.config_id || 'global';
   try {
-    const res = await db.collection('system_config').doc('global_config').get();
+    const res = await db.collection('30_system_config').doc(configId).get();
     return { code: 200, data: res.data || {} };
   } catch (err) {
     // 第一次查不到说明还没初始化
     return { code: 200, data: { status: "未配置" } };
   }
 }
-async function updateManageConfig({ data }) {
+async function updateManageConfig(payload) {
+  const configId = payload.config_id || 'global';
+  const updateData = { ...payload.data, updateTime: db.serverDate() };
+  delete updateData._id;
   try {
-    // 这里的 data 对应前端 updateSystemConfig 传来的配置对象
-    const updateData = { ...data, updateTime: db.serverDate() };
-    delete updateData._id;
-    // 获取并更新或新建
-    await db.collection('system_config').doc('global_config').set({ data: updateData });
+    const docRef = db.collection('30_system_config').doc(configId);
+    let exists = false;
+    try {
+      await docRef.get();
+      exists = true;
+    } catch (getErr) {
+      exists = false;
+    }
+
+    if (exists) {
+      await docRef.update({ data: updateData });
+    } else {
+      await docRef.set({ data: updateData });
+    }
+    
     return { code: 200, msg: "配置保存成功" };
   } catch (err) {
+    if (err.message && err.message.includes('collection not exists')) {
+      try {
+        await db.createCollection('30_system_config');
+        await db.collection('30_system_config').doc('global').set({ data: updateData });
+        return { code: 200, msg: "配置保存成功" };
+      } catch (createErr) {
+        return { code: 500, msg: "需要手动创建系统集合: 请在云开发控制台数据库中新建集合 system_config" };
+      }
+    }
     return { code: 500, msg: "配置保存失败: " + err.message };
   }
 }
 // ==================== [4.5] 运营配置 ====================
 async function getOperationsConfig() {
   try {
-    const res = await db.collection('system_config').doc('operations_config').get();
+    const res = await db.collection('30_system_config').doc('operations_config').get();
     return { code: 200, data: res.data || {} };
   } catch (err) {
     return { code: 200, data: { status: "未配置" } };
   }
 }
 async function updateOperationsConfig({ data }) {
+  const updateData = { ...data, updateTime: db.serverDate() };
+  delete updateData._id;
   try {
-    const updateData = { ...data, updateTime: db.serverDate() };
-    delete updateData._id;
-    await db.collection('system_config').doc('operations_config').set({ data: updateData });
+    await db.collection('30_system_config').doc('operations_config').set({ data: updateData });
     return { code: 200, msg: "运营配置保存成功" };
   } catch (err) {
+    if (err.message && err.message.includes('collection not exists')) {
+      try {
+        await db.createCollection('30_system_config');
+        await db.collection('30_system_config').doc('operations_config').set({ data: updateData });
+        return { code: 200, msg: "运营配置保存成功" };
+      } catch (e) {
+        return { code: 500, msg: "需要手动创建系统集合: 请在云开发控制台新建集合 system_config" };
+      }
+    }
     return { code: 500, msg: "运营配置保存失败: " + err.message };
   }
 }
 // ==================== [4.6] 系统说明书 ====================
 async function getDoc() {
   try {
-    const res = await db.collection('system_config').doc('documentation').get();
+    const res = await db.collection('30_system_config').doc('documentation').get();
     if (res.data && res.data.content) {
       return { code: 200, data: res.data };
     }
     // 如果没有数据，返回默认预设内容
     const defaultData = [
       {
-        title: "1. 关于积分",
+        title: "1. 订单同步逻辑",
         items: [
-          { q: "什么是积分？", a: "积分是平台提供的福利，您在购买受支持的特权商品或参与邀请活动时均可获得可观的积分奖励。" },
-          { q: "积分怎么拿到手？", a: "您通过本平台转化的订单若无退款，对应的奖励积分将在下个月的 20 号自动到账至此账号。" }
+          { q: "订单什么时候同步？", a: "订单一般在用户下单后的 15-30 分钟内同步到系统。" },
+          { q: "为什么订单状态没有更新？", a: "订单状态每天定时更新，如果是刚刚确认收货，请等待明天刷新。" }
         ]
       },
       {
@@ -442,10 +737,10 @@ async function getDoc() {
     // 同样返回默认预设
     const defaultData = [
       {
-        title: "1. 关于积分",
+        title: "1. 订单同步逻辑",
         items: [
-          { q: "什么是积分？", a: "积分是平台提供的福利，您在购买受支持的特权商品或参与邀请活动时均可获得可观的积分奖励。" },
-          { q: "积分怎么拿到手？", a: "您通过本平台转化的订单若无退款，对应的奖励积分将在下个月的 20 号自动到账至此账号。" }
+          { q: "订单什么时候同步？", a: "订单一般在用户下单后的 15-30 分钟内同步到系统。" },
+          { q: "为什么订单状态没有更新？", a: "订单状态每天定时更新，如果是刚刚确认收货，请等待明天刷新。" }
         ]
       },
       {
@@ -465,102 +760,39 @@ async function getDoc() {
   }
 }
 async function updateDoc({ data }) {
+  const updateData = { content: data, updateTime: db.serverDate() };
   try {
-    const updateData = { content: data, updateTime: db.serverDate() };
-    await db.collection('system_config').doc('documentation').set({ data: updateData });
+    await db.collection('30_system_config').doc('documentation').set({ data: updateData });
     return { code: 200, msg: "说明书更新成功" };
   } catch (err) {
+    if (err.message && err.message.includes('collection not exists')) {
+      try {
+        await db.createCollection('30_system_config');
+        await db.collection('30_system_config').doc('documentation').set({ data: updateData });
+        return { code: 200, msg: "说明书更新成功" };
+      } catch (e) {
+        return { code: 500, msg: "需要手动创建系统集合: 请在云开发控制台新建集合 system_config" };
+      }
+    }
     return { code: 500, msg: "说明文档保存失败: " + err.message };
   }
 }
-// ==================== [5] 积分规则 ====================
-async function getPointsRules({ keyword, page = 1, pageSize = 10 }) {
-  const query = {};
-  if (keyword) {
-    // 使用正则模糊匹配规则名称
-    query.ruleName = db.RegExp({ regexp: keyword, options: 'i' });
-  }
-  const collection = db.collection('points_rules');
-  const countRes = await collection.where(query).count();
-  const listRes = await collection.where(query)
-    .skip((page - 1) * pageSize)
-    .limit(pageSize)
-    .orderBy('createTime', 'desc')
-    .get();
-  return {
-    code: 200,
-    data: {
-      list: listRes.data,
-      total: countRes.total,
-      page,
-      pageSize
-    }
-  };
-}
-async function getPointsRule({ id }) {
-  const res = await db.collection('points_rules').doc(id).get();
-  return { code: 200, data: res.data };
-}
+// ==================== [5] 手动触发任务 ====================
+async function runCronTask(payload) {
+  const taskId = payload.taskId;
+  const startTime = payload.startTime;
+  const endTime = payload.endTime;
 
-async function createPointsRule({ data }) {
-  const ruleData = {
-    ...data,
-    createTime: db.serverDate(),
-    updateTime: db.serverDate(),
-  };
-
-  // 如果新规则是生效状态，先将所有现有规则置为失效
-  if (ruleData.status === 'active') {
-    await db.collection('points_rules').where({ status: 'active' }).update({
-      data: { status: 'inactive', updateTime: db.serverDate() }
-    });
-  }
-
-  await db.collection('points_rules').add({ data: ruleData });
-  return { code: 200, msg: "规则创建成功" };
-}
-
-async function updatePointsRule({ id, data }) {
-  const ruleData = {
-    ...data,
-    updateTime: db.serverDate(),
-  };
-  delete ruleData._id;
-  delete ruleData.createTime;
-
-  // 如果该规则被设置为生效，先将其它所有规则置为失效
-  if (ruleData.status === 'active') {
-    await db.collection('points_rules').where({ 
-      _id: _.neq(id), 
-      status: 'active' 
-    }).update({
-      data: { status: 'inactive', updateTime: db.serverDate() }
-    });
-  }
-
-  await db.collection('points_rules').doc(id).update({ data: ruleData });
-  return { code: 200, msg: "规则更新成功" };
-}
-
-async function deletePointsRule({ id }) {
-  // 校验：不能删除生效中的规则
-  const rule = await db.collection('points_rules').doc(id).get();
-  if (rule.data && rule.data.status === 'active') {
-    return { code: 400, msg: "无法删除当前生效的规则，请先切换生效规则" };
-  }
-
-  await db.collection('points_rules').doc(id).remove();
-  return { code: 200, msg: "规则删除成功" };
-}
-async function runCronTask({ taskId }) {
   try {
-    if (taskId === 'cron_1' || taskId.includes('sync')) {
+    if (taskId && taskId.includes('sync')) {
       // 触发订单同步云函数 (异步调用)
-      await cloud.callFunction({
-        name: 'sync_tk_orders',
-        data: { triggerSource: 'admin_manual' }
-      });
-      return { code: 200, msg: "同步任务已启动，请 1 分钟后查看订单列表" };
+      // 注意：为了防止 API 网关 15s 超时，发出请求后不阻塞等待其完成，从而避免 504 Gateway Timeout
+      cloud.callFunction({
+        name: taskId,
+        data: { triggerSource: 'admin_manual', startTime, endTime }
+      }).catch(e => console.error("[Admin API] 异步调用云函数异常:", e));
+      
+      return { code: 200, msg: "同步任务已启动，后台正在执行中" };
     }
     return { code: 400, msg: "暂不支持手动触发该类型任务" };
   } catch (err) {
@@ -569,30 +801,37 @@ async function runCronTask({ taskId }) {
 }
 
 // ==================== [6] 定时任务日志 ====================
-async function getCronTasks() {
+async function getCronTasks({ platform }) {
   // 定义静态任务元数据
   const taskConfigs = [
     {
       taskId: 'sync_tk_orders',
       taskName: '同步折淘客后台订单',
       taskType: '订单同步',
+      platform: '淘宝',
       description: '从折淘客 API 拉取最近 40 分钟内的淘宝订单状态并同步到本地库',
       cronExpression: '0 0/10 * * * ?',
     },
     {
-      taskId: 'recycle_points',
-      taskName: '回收过期超时积分',
-      taskType: '积分结算',
-      description: '对超过 15 天未结算的订单积分进行系统回收或状态标记',
-      cronExpression: '0 0 2 * * ?',
+      taskId: 'sync_jd_orders',
+      taskName: '同步折京客后台订单',
+      taskType: '订单同步',
+      platform: '京东',
+      description: '从折京客 API 拉取最近 2 小时内的京东订单状态并同步到本地库',
+      cronExpression: '0 */10 * * * * *',
     }
   ];
 
+  let filteredConfigs = taskConfigs;
+  if (platform) {
+    filteredConfigs = taskConfigs.filter(t => t.platform === platform);
+  }
+
   const taskList = [];
 
-  for (const config of taskConfigs) {
+  for (const config of filteredConfigs) {
     // 获取每个任务的最后一次执行记录
-    const lastLog = await db.collection('task_logs')
+    const lastLog = await db.collection('30_task_logs')
       .where({ taskId: config.taskId })
       .orderBy('startTime', 'desc')
       .limit(1)
@@ -622,8 +861,8 @@ async function getCronTasks() {
 }
 
 async function getCronLogs({ taskId, page = 1, pageSize = 10 }) {
-  const countRes = await db.collection('task_logs').where({ taskId }).count();
-  const listRes = await db.collection('task_logs')
+  const countRes = await db.collection('30_task_logs').where({ taskId }).count();
+  const listRes = await db.collection('30_task_logs')
     .where({ taskId })
     .orderBy('startTime', 'desc')
     .skip((page - 1) * pageSize)
@@ -639,4 +878,112 @@ async function getCronLogs({ taskId, page = 1, pageSize = 10 }) {
       pageSize
     }
   };
+}
+
+// ==========================================
+// 临时数据聚合：将历史 30_orders 数据汇总到 30_daily_stats
+// ==========================================
+async function backfillStats() {
+  try {
+    const _ = db.command;
+    // 获取所有的非失效订单，进行聚合。由于这里只作单次补数据使用，最大获取1000条即可
+    const res = await db.collection('30_orders').where({
+      status: _.neq('invalid')
+    }).limit(1000).get();
+
+    const orders = res.data || [];
+    if (orders.length === 0) {
+      return { code: 200, msg: "没有需要聚合的历史订单数据" };
+    }
+
+    const statsMap = {};
+    orders.forEach(order => {
+      // 兼容历史表可能使用的其他时间字段
+      let dTime = order.createTime || order.create_time || order.created_at || order.tk_create_time || order.time || order.pay_time;
+      
+      // 如果是个 Date 对象，转成字符串
+      if (dTime && typeof dTime.toISOString === 'function') {
+        dTime = dTime.toISOString();
+      }
+
+      if (!dTime || typeof dTime !== 'string') return;
+      
+      const dateStr = dTime.substring(0, 10); // 取 YYYY-MM-DD
+      
+      if (!statsMap[dateStr]) {
+        statsMap[dateStr] = { amount: 0, count: 0, date: dateStr };
+      }
+      statsMap[dateStr].amount += (order.commission || order.commission_fee || 0);
+      statsMap[dateStr].count += 1;
+    });
+
+    if (Object.keys(statsMap).length === 0) {
+      return { 
+        code: 200, 
+        msg: "遍历了订单，但没有找到有效的时间字段导致无法聚合", 
+        debug_sample_order: orders[0] 
+      };
+    }
+
+    // 写入数据库
+    const promises = Object.keys(statsMap).map(dateStr => {
+      const stat = statsMap[dateStr];
+      stat.amount = parseFloat(stat.amount.toFixed(2));
+      stat.updateTime = db.serverDate();
+      
+      return db.collection('30_daily_stats').doc(dateStr).set({
+        data: stat
+      });
+    });
+
+    await Promise.all(promises);
+
+    return { 
+      code: 200, 
+      msg: `历史大盘数据聚合成功，共计更新了 ${Object.keys(statsMap).length} 天的数据！`,
+      data: statsMap
+    };
+  } catch (error) {
+    return { code: 500, msg: "历史数据聚合失败: " + error.message };
+  }
+}
+
+// ==========================================
+// 模块 10: 操作日志查询
+// ==========================================
+async function getOperationLogs({ page = 1, pageSize = 20 }) {
+  try {
+    const skip = (page - 1) * pageSize;
+    const countRes = await db.collection('30_admin_logs').count();
+    const total = countRes.total;
+
+    const res = await db.collection('30_admin_logs')
+      .orderBy('created_at', 'desc')
+      .skip(skip)
+      .limit(pageSize)
+      .get();
+
+    return {
+      code: 200,
+      data: {
+        items: res.data,
+        total: total,
+        page: page,
+        pageSize: pageSize
+      }
+    };
+  } catch (err) {
+    if (err.message && err.message.includes('not exist')) {
+      return {
+        code: 200,
+        data: {
+          items: [],
+          total: 0,
+          page: page,
+          pageSize: pageSize
+        }
+      };
+    }
+    return { code: 500, msg: "获取日志失败: " + err.message };
+  }
 }

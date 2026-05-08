@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 import { Form, Input, Button, message } from "antd";
 import { Lock, User } from "lucide-react";
 import { login } from "../../services/api/index";
+import { setAdminToken } from "../../services/api";
 import logo from "@/assets/logo.png";
 
 export default function LoginPage() {
@@ -12,21 +13,22 @@ export default function LoginPage() {
   const onFinish = async (values: { username: string; password: string }) => {
     try {
       setLoading(true);
-      const res = await login(values);
-      
-      // Axios interceptor will throw if code !== 0, 
-      // but in your backend it returns { code: 200, data: { token } }
-      // The interceptor might need tweaking or we handle response here
-      const result = res.data || res;
-      
+      const result = await login(values);
+
       if (result && result.token) {
-        localStorage.setItem("adminToken", result.token);
+        // 存储 token 及用户信息
+        setAdminToken(result.token);
         localStorage.setItem("isLoggedIn", "true");
-        message.success("登录成功");
+        localStorage.setItem("adminUsername", result.username || values.username);
+        localStorage.setItem("adminRole", result.role || "admin");
+        message.success(`欢迎回来，${result.username}`);
         navigate("/");
+      } else {
+        message.error("登录失败：未获取到有效凭证");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("登录异常", error);
+      message.error(error?.message && error.message !== 'API Error' ? error.message : "登录失败，请检查账号密码或网络连接");
     } finally {
       setLoading(false);
     }
@@ -40,7 +42,7 @@ export default function LoginPage() {
             <img src={logo} style={{ width: 48, height: 48, objectFit: "contain" }} alt="Logo" />
             <span style={{ fontSize: 28 }}>小栗鼠</span>
           </div>
-          <p style={{ color: "#888888", fontSize: 14 }}>后台管理系统 V1.2.0</p>
+          <p style={{ color: "#888888", fontSize: 14 }}>后台管理系统 V2.0</p>
         </div>
         <Form name="login" onFinish={onFinish} layout="vertical" size="large">
           <Form.Item
@@ -66,9 +68,9 @@ export default function LoginPage() {
           </Form.Item>
         </Form>
         <div style={{ textAlign: "center", color: "#B2B2B2", fontSize: 12, marginTop: 24 }}>
-          <p>尝试使用分配的管理员凭据登录</p>
+          <p>默认超级管理员：Superuser / password</p>
           <p style={{ marginTop: 8 }}>
-            超级管理员单点登录 | 操作将被安全审计
+            超级管理员可管理其他管理员账号 | 操作将被安全审计
           </p>
         </div>
       </div>

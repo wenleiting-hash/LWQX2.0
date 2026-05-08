@@ -1,0 +1,178 @@
+page {
+  background: #F7F8FA;
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Segoe UI, Arial, Roboto, 'PingFang SC', 'miui', 'Hiragino Sans GB', 'Microsoft Yahei', sans-serif;
+}
+
+.container {
+  padding-bottom: calc(60rpx + env(safe-area-inset-bottom));
+}
+
+.hero-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60rpx 40rpx 40rpx;
+}
+
+.hero-icon-box {
+  width: 140rpx;
+  height: 140rpx;
+  background: linear-gradient(135deg, #FF7A00 0%, #FF5000 100%);
+  border-radius: 40rpx;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 16rpx 32rpx rgba(255, 98, 0, 0.25);
+  margin-bottom: 32rpx;
+}
+
+.hero-icon {
+  font-size: 64rpx;
+}
+
+.hero-title {
+  font-size: 44rpx;
+  font-weight: 800;
+  color: #1A1A1A;
+  margin-bottom: 16rpx;
+}
+
+.hero-subtitle {
+  font-size: 28rpx;
+  color: #888888;
+}
+
+.content-box {
+  padding: 0 32rpx;
+}
+
+.qr-card {
+  background-color: #FFFFFF;
+  border-radius: 40rpx;
+  padding: 48rpx 40rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 32rpx;
+  box-shadow: 0 12rpx 32rpx rgba(0, 0, 0, 0.04);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+  margin-bottom: 40rpx;
+  width: 100%;
+}
+
+.header-line {
+  flex: 1;
+  height: 2rpx;
+  background: linear-gradient(90deg, rgba(238,238,238,0) 0%, #EEEEEE 50%, rgba(238,238,238,0) 100%);
+}
+
+.header-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #888;
+  letter-spacing: 2rpx;
+}
+
+.qr-wrapper {
+  position: relative;
+}
+
+.qr-border {
+  padding: 20rpx;
+  background: #fff;
+  border-radius: 36rpx;
+  box-shadow: 0 16rpx 40rpx rgba(0, 0, 0, 0.08), inset 0 0 0 2rpx rgba(255, 98, 0, 0.1);
+}
+
+.qr-img {
+  width: 360rpx;
+  height: 360rpx;
+  border-radius: 20rpx;
+  background-color: #fafafa;
+}
+
+.action-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+
+.contact-item {
+  display: flex;
+  align-items: center;
+  background-color: #FFFFFF;
+  padding: 32rpx;
+  border-radius: 32rpx;
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.03);
+  transition: all 0.2s ease;
+}
+
+.item-hover {
+  transform: scale(0.98);
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.02);
+}
+
+.item-icon-wrap {
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: 28rpx;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 28rpx;
+}
+
+.wechat-wrap { 
+  background: linear-gradient(135deg, #E8F9F0 0%, #D1F2E0 100%);
+}
+
+.phone-wrap { 
+  background: linear-gradient(135deg, #E6F3FF 0%, #CCE7FF 100%);
+}
+
+.icon-emoji {
+  font-size: 44rpx;
+}
+
+.item-info {
+  flex: 1;
+}
+
+.item-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #1A1A1A;
+  margin-bottom: 8rpx;
+}
+
+.item-desc {
+  font-size: 26rpx;
+  color: #888888;
+}
+
+.font-num {
+  font-family: din, -apple-system, BlinkMacSystemFont, sans-serif;
+  letter-spacing: 0.5rpx;
+}
+
+.item-btn {
+  font-size: 26rpx;
+  font-weight: 600;
+  padding: 12rpx 32rpx;
+  border-radius: 100rpx;
+}
+
+.wechat-btn {
+  color: #07C160;
+  background-color: #E8F9F0;
+}
+
+.phone-btn {
+  color: #1989FA;
+  background-color: #E6F3FF;
+}

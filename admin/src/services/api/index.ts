@@ -11,6 +11,27 @@ export const login = (data: any) => {
 
 /**
  * ==========================================
+ * 0.5 管理员用户管理 (Admin Users)
+ * ==========================================
+ */
+export const getAdminUsers = () => {
+  return api.post('', { action: 'get_admin_users' });
+};
+
+export const addAdminUser = (data: { username: string; password: string; role?: string }) => {
+  return api.post('', { action: 'add_admin_user', data });
+};
+
+export const updateAdminUser = (id: string, data: { password?: string; role?: string }) => {
+  return api.post('', { action: 'update_admin_user', id, data });
+};
+
+export const deleteAdminUser = (id: string) => {
+  return api.post('', { action: 'delete_admin_user', id });
+};
+
+/**
+ * ==========================================
  * 1. 财务大盘 (Dashboard)
  * ==========================================
  */
@@ -23,12 +44,12 @@ export const getDashboardStats = () => {
  * 2. 基础设置 (System Config)
  * ==========================================
  */
-export const getSystemConfig = () => {
-  return api.post('', { action: 'get_manage_config' });
+export const getSystemConfig = (configId: string = 'global') => {
+  return api.post('', { action: 'get_manage_config', config_id: configId });
 };
 
-export const updateSystemConfig = (configData: any) => {
-  return api.post('', { action: 'update_manage_config', data: configData });
+export const updateSystemConfig = (configId: string, configData: any) => {
+  return api.post('', { action: 'update_manage_config', config_id: configId, data: configData });
 };
 
 /**
@@ -44,86 +65,46 @@ export const updateOperationsConfig = (configData: any) => {
   return api.post('', { action: 'update_operations_config', data: configData });
 };
 
-/**
- * ==========================================
- * 3. 积分规则 (Points Rules)
- * ==========================================
- */
-export const getPointsRules = () => {
-  return api.post('', { action: 'get_points_rules' });
-};
 
-export const getPointsRule = (id: string) => {
-  return api.post('', { action: 'get_points_rule', id });
-};
-
-export const createPointsRule = (ruleData: any) => {
-  return api.post('', { action: 'create_points_rule', data: ruleData });
-};
-
-export const updatePointsRule = (id: string, ruleData: any) => {
-  return api.post('', { action: 'update_points_rule', id, data: ruleData });
-};
-
-export const deletePointsRule = (id: string) => {
-  return api.post('', { action: 'delete_points_rule', id });
-};
-
-/**
- * ==========================================
- * 4. 订单中心 (Order Center)
- * ==========================================
- */
 export interface OrderQuery {
   page: number;
   pageSize: number;
   status?: string;
   orderId?: string;
+  platform?: string;
 }
 
 export const getOrders = (query: OrderQuery) => {
-  // 映射前端的 searchText (orderId) 为后端的 keyword
-  return api.post('', { action: 'get_orders', page: query.page, pageSize: query.pageSize, keyword: query.orderId || '' });
+  // 映射前端的 searchText (orderId) 为后端的 keyword，并透传 platform 参数
+  return api.post('', { 
+    action: 'get_orders', 
+    page: query.page, 
+    pageSize: query.pageSize, 
+    keyword: query.orderId || '',
+    platform: query.platform
+  });
 };
 
-/**
- * ==========================================
- * 5. 用户积分 (User Assets)
- * ==========================================
- */
-export interface UserQuery {
-  page: number;
-  pageSize: number;
-  userId?: string;
-}
 
-export const getUsers = (query: UserQuery) => {
-  return api.post('', { action: 'get_users', page: query.page, pageSize: query.pageSize, keyword: query.userId || '' });
-};
-
-export const freezeUser = (userId: string, reason: string) => {
-  return api.post('', { action: 'toggle_user_status', openid: userId, status: 0 }); // 0: 冻结
-};
-
-export const unfreezeUser = (userId: string) => {
-  return api.post('', { action: 'toggle_user_status', openid: userId, status: 1 }); // 1: 正常
-};
-
-/**
- * ==========================================
- * 6. 任务调度 (Task Scheduler)
- * ==========================================
- */
-export const getCronTasks = () => {
-  return api.post('', { action: 'get_cron_tasks' });
+export const getCronTasks = (platform?: string) => {
+  return api.post('', { action: 'get_cron_tasks', platform });
 };
 
 export const getCronLogs = (params: { taskId: string; page?: number; pageSize?: number }) => {
   return api.post('', { action: 'get_cron_logs', ...params });
 };
 
-export const runCronTask = (taskId: string) => {
-  return api.post('', { action: 'run_cron_task', taskId });
+export const runCronTask = (taskId: string, extraPayload?: any) => {
+  return api.post('', { action: 'run_cron_task', taskId, ...extraPayload });
+};
+
+/**
+ * ==========================================
+ * 8. 操作日志 (Operation Logs)
+ * ==========================================
+ */
+export const getOperationLogs = (params: { page?: number; pageSize?: number }) => {
+  return api.post('', { action: 'get_operation_logs', ...params });
 };
 
 export const getDoc = () => {
@@ -132,4 +113,8 @@ export const getDoc = () => {
 
 export const updateDoc = (content: string) => {
   return api.post('', { action: 'update_doc', data: content });
+};
+
+export const getSearchLogs = (params?: any) => {
+  return api.post('', { action: 'get_search_logs', ...params });
 };

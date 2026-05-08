@@ -1,0 +1,37 @@
+<view class="search-bar-wrap bg-white" bindtap="handleTap">
+  <view class="search-box bg-gray-100 rounded-full flex flex-row items-center">
+    <!-- 搜索图标 -->
+    <view class="icon-wrap">
+      <image class="search-icon" src="/images/tabbar/search.png" mode="aspectFit"></image>
+    </view>
+    
+    <!-- 输入框/文本区 -->
+    <block wx:if="{{mode === 'input'}}">
+      <input 
+        class="search-input flex-1 text-sm text-gray-900" 
+        placeholder="{{placeholder}}" 
+        placeholder-class="text-gray-400"
+        value="{{inputValue}}"
+        focus="{{autoFocus}}"
+        confirm-type="search"
+        bindinput="handleInput"
+        bindconfirm="handleConfirm"
+      />
+    </block>
+    <block wx:else>
+      <view class="search-text flex-1 text-sm text-gray-400 line-clamp-1">
+        {{inputValue || placeholder}}
+      </view>
+    </block>
+
+    <!-- 清除按钮 -->
+    <view class="clear-wrap" wx:if="{{mode === 'input' && inputValue}}" catchtap="handleClear">
+      <view class="clear-icon bg-gray-300 text-white flex items-center justify-center rounded-full">×</view>
+    </view>
+
+    <!-- 搜索按钮 -->
+    <view class="search-btn bg-brand text-white text-sm font-medium rounded-full flex items-center justify-center" wx:if="{{mode === 'input'}}" catchtap="handleConfirm">
+      搜索
+    </view>
+  </view>
+</view>

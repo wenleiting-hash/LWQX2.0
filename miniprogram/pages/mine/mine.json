@@ -1,8 +1,6 @@
 {
-  "navigationBarTitleText": "个人中心",
-  "navigationStyle": "custom",
-  "navigationBarTextStyle": "white",
-  "usingComponents": {
-    "auth-modal": "/components/auth-modal/auth-modal"
-  }
+  "navigationBarTitleText": "我的",
+  "navigationBarBackgroundColor": "#FEF8F4",
+  "navigationBarTextStyle": "black",
+  "usingComponents": {}
 }

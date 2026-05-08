@@ -1,0 +1,35 @@
+<view class="container pb-safe">
+  
+  <view class="list-container" wx:if="{{historyList && historyList.length > 0}}">
+    <view class="action-bar">
+      <view class="count-text">共 {{historyList.length}} 件商品</view>
+      <view class="clear-btn" bindtap="clearHistory">清空足迹 <view class="icon-trash"></view></view>
+    </view>
+
+    <!-- Content -->
+    <view class="history-item-wrap" wx:for="{{historyList}}" wx:key="index">
+      <scroll-view class="history-scroll" scroll-x="true">
+        <view class="history-item" bindtap="goToDetail" data-item="{{item}}">
+          <view class="item-image-wrap">
+            <image class="item-image" src="{{item.image_url || item.image || item.pict_url}}" mode="aspectFill"></image>
+          </view>
+          <view class="item-content">
+            <view class="item-title line-clamp-2">{{item.title || item.name}}</view>
+            <view class="item-price-row">
+              <view class="item-price">{{item.coupon_price || item.price || item.zk_final_price}}</view>
+              <view class="item-time" wx:if="{{item.coupon_amount || item.couponAmount}}">券 ¥{{item.coupon_amount || item.couponAmount}}</view>
+            </view>
+          </view>
+        </view>
+        <view class="delete-btn" catchtap="deleteItem" data-index="{{index}}">删除</view>
+      </scroll-view>
+    </view>
+  </view>
+
+  <view class="empty-state" wx:else>
+    <view class="empty-emoji">📭</view>
+    <view class="empty-title">您还没有浏览任何商品</view>
+    <view class="empty-desc">快去逛逛，发现好物吧</view>
+    <view class="empty-btn" bindtap="goToDiscover">去逛逛</view>
+  </view>
+</view>

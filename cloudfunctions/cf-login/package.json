@@ -1,0 +1,9 @@
+{
+  "name": "cf-login",
+  "version": "1.0.0",
+  "description": "Silent login logic, writes to 30_members and 30_login_logs",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

@@ -1,3 +1,6 @@
 {
-  "navigationBarTitleText": "加入社群"
+  "navigationBarTitleText": "热门晒单",
+  "navigationBarBackgroundColor": "#FFFFFF",
+  "navigationBarTextStyle": "black",
+  "usingComponents": {}
 }

@@ -1,0 +1,33 @@
+<view class="container pb-safe">
+  <!-- 顶部渐变与插画背景 -->
+  <view class="header-bg">
+    <image class="header-img" src="/images/invite_bg.png" mode="widthFix" wx:if="{{hasImage}}"></image>
+    <view class="header-content">
+      <view class="title">邀请好友 一起省钱</view>
+      <view class="subtitle">分享小栗鼠，好物不再错过</view>
+    </view>
+  </view>
+
+  <!-- 专属海报卡片 -->
+  <view class="invite-card">
+    <view class="card-title">我的专属邀请海报</view>
+    <view class="poster-preview">
+      <image class="poster-img" src="{{posterUrl}}" mode="aspectFit" wx:if="{{posterUrl}}"></image>
+      <view class="poster-placeholder" wx:else>
+        <text class="placeholder-text">海报生成中...</text>
+      </view>
+    </view>
+    <view class="btn-group">
+      <button class="btn-share" open-type="share">分享给微信好友</button>
+      <button class="btn-save" bindtap="savePoster">保存海报到相册</button>
+    </view>
+  </view>
+
+  <!-- 邀请规则 -->
+  <view class="rule-box">
+    <view class="rule-title">邀请规则</view>
+    <view class="rule-item">1. 分享专属海报或小程序链接给好友。</view>
+    <view class="rule-item">2. 好友可通过您的分享便捷打开小栗鼠体验查券功能。</view>
+    <view class="rule-item">3. 独乐乐不如众乐乐，一起享受全网隐藏优惠券！</view>
+  </view>
+</view>

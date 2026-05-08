@@ -75,10 +75,10 @@ export default function Documentation() {
       <div style={{ marginBottom: 24 }}>
         <h2 style={{ margin: 0, display: "flex", alignItems: "center", gap: 12 }}>
           <FileText size={24} style={{ color: "#FF6B35" }} />
-          使用说明
+          常见问题
         </h2>
         <p style={{ color: "#666666", margin: "8px 0 0 0", fontSize: 14 }}>
-          编辑和管理系统使用说明文档
+          编辑和管理常见问题文档
         </p>
       </div>
       <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'flex-end' }}>

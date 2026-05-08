@@ -1,150 +1,138 @@
-<view class="page" data-weui-theme="{{theme}}">
-  <!-- NavBar -->
-  <view class="nav-container" style="padding-top: {{statusBarHeight}}px;">
-    <view class="nav-bar" style="height: {{navHeight}}px;">
-      <image class="nav-logo" src="/images/logo.png" mode="aspectFit"></image>
-      <text class="nav-bar-title">小栗鼠</text>
+<view class="home-container">
+  
+  <!-- 极简顶部导航栏 -->
+  <view class="custom-nav-bar">
+    <view class="status-bar" style="height: {{statusBarHeight || 44}}px;"></view>
+    <view class="title-bar" style="height: 44px; justify-content: center;">
+      <text class="title-text-simple">小栗鼠</text>
     </view>
   </view>
-  <!-- 顶置搜索栏区 -->
-  <view class="header-section">
-    <view class="search-wrap">
-      <view class="search-bar">
-        <image class="search-icon" src="/images/icons/search_grey.png" mode="aspectFit"></image>
-        <input class="search-input" placeholder="粘贴商品链接，自动识别优惠" placeholder-style="color: #B2B2B2;" bindinput="onInputChange" value="{{searchQuery}}" confirm-type="search" bindconfirm="onSearch" />
-        <view wx:if="{{searchQuery.length > 0}}" class="search-clear-wrap" bindtap="clearSearch">
-          <icon type="clear" size="16" color="#B2B2B2"></icon>
+
+  <scroll-view class="content-scroll" scroll-y="true">
+    <view class="content-wrapper-center">
+      
+      <!-- 居中的大 Logo -->
+      <view class="logo-section">
+        <view class="big-logo-wrap">
+          <image class="big-logo" src="../../images/logo.png" mode="aspectFit" />
         </view>
       </view>
-      <view class="search-btn" bindtap="onSearch">查券</view>
-    </view>
-  </view>
 
-  <scroll-view scroll-y class="page__bd" enhanced show-scrollbar="{{false}}">
-    <!-- 核心引导区 -->
-    <view class="guide-hero">
-      <view class="guide-icon-box">
-        <image class="guide-icon-img" src="/images/icons/clipboard_paste.png" mode="aspectFit"></image>
+      <!-- 一体化搜索卡片 -->
+      <view class="search-card-integrated elevated">
+        <view class="textarea-wrapper">
+          <textarea 
+            class="search-textarea" 
+            placeholder="请长按粘贴淘宝/京东商品链接或口令" 
+            placeholder-class="placeholder-text"
+            value="{{inputValue}}" 
+            bindinput="onInput"
+            maxlength="800"
+            disable-default-padding="true"
+          ></textarea>
+          <view class="clear-input-btn" wx:if="{{inputValue.length > 0}}" bindtap="onClearInput" style="position: absolute; right: 20rpx; bottom: 20rpx; z-index: 10; padding: 10rpx;">
+            <icon type="clear" size="18" color="#ccc"/>
+          </view>
+        </view>
+        <view class="search-btn-integrated" hover-class="btn-active" bindtap="onSearch">
+          <text class="search-btn-text">一键查券</text>
+        </view>
       </view>
-      <view class="guide-main-title">复制链接，自动查优惠</view>
-      <view class="guide-tips">
-        <view>去淘宝/京东/拼多多 复制商品链接</view>
-        <view>打开小程序即可自动识别并显示隐藏优惠</view>
-      </view>
-    </view>
 
-    <!-- 3步省钱攻略 -->
-    <view class="strategy-section">
-      <view class="section-hd">3步省钱攻略</view>
+      <!-- 扁平化横向引导流程 -->
+      <view class="guide-flow">
+        <view class="flow-item">
+          <view class="flow-icon-wrap"><text class="flow-num">1</text></view>
+          <text class="flow-text">复制商品链接</text>
+        </view>
+        <view class="flow-arrow">
+          <view class="icon-arrow-mini"></view>
+        </view>
+        <view class="flow-item">
+          <view class="flow-icon-wrap"><text class="flow-num">2</text></view>
+          <text class="flow-text">打开小栗鼠</text>
+        </view>
+        <view class="flow-arrow">
+          <view class="icon-arrow-mini"></view>
+        </view>
+        <view class="flow-item">
+          <view class="flow-icon-wrap"><text class="flow-num">3</text></view>
+          <text class="flow-text">一键查券省钱</text>
+        </view>
+      </view>
       
-      <view class="strategy-card">
-        <view class="step-badge">1</view>
-        <view class="step-text">打开淘宝/京东/拼多多，找到心仪商品</view>
-      </view>
-
-      <view class="strategy-card">
-        <view class="step-badge">2</view>
-        <view class="step-text">点击「分享」复制商品链接或口令</view>
-      </view>
-
-      <view class="strategy-card">
-        <view class="step-badge">3</view>
-        <view class="step-text">回到本小程序，自动弹出优惠信息</view>
-      </view>
     </view>
-    
-    <!-- 防遮挡占位垫(适配底部原生tabBar高度及安全区) -->
-    <view class="safe-area-spacer" style="height: 100rpx; padding-bottom: env(safe-area-inset-bottom);"></view>
   </scroll-view>
 
-  <!-- 结果弹窗 ( 完全还原 l9ta6/fN8zr 的设计 ) -->
-  <view class="fadeIn" wx:if="{{showResult}}">
-    <view class="weui-mask" bindtap="closeResult"></view>
-    <view class="custom-bottom-sheet">
-      <view class="sheet-handle-bar">
-        <view class="sheet-handle"></view>
+  <!-- 智能截获弹窗 Modal -->
+  <view class="modal-overlay" wx:if="{{showClipboard}}">
+    <view class="modal-content">
+      <view class="modal-header">
+        <view class="modal-icon-bg">
+          <view class="icon-gift"></view>
+        </view>
+        <view class="modal-title font-bold">发现专属优惠</view>
       </view>
-      <view class="sheet-header">
-        <text class="sheet-title">发现隐藏优惠</text>
-        <image class="sheet-close-icon" src="/images/icons/close_x.png" mode="aspectFit" bindtap="closeResult"></image>
+      <view class="modal-body">
+        <view class="modal-desc line-clamp-2">{{clipboardText}}</view>
       </view>
-      <view class="result-card">
-        <image wx:if="{{result.img}}" class="result-card__img" src="{{result.img}}" mode="aspectFill"></image>
-        <view class="result-card__info" style="{{!result.img ? 'margin-left: 0;' : ''}}">
-          <view class="result-card__title">{{result.title}}</view>
-          <block wx:if="{{result.couponPrice != '0.00' && result.couponPrice != '0'}}">
-            <view class="result-card__price-row">
-              <text class="price-val">¥{{result.couponPrice}}</text>
-              <text class="price-origin">¥{{result.originPrice}}</text>
-            </view>
-            <view class="result-card__tags">
-              <view class="tag-combined">
-                <text>为您省下 ¥{{result.originPrice - result.couponPrice}}</text>
-                <text>预估积分: {{result.points}}</text>
-              </view>
-              <view wx:if="{{result.subsidy}}" class="tag-subsidy">政府补贴 15%</view>
-            </view>
+      <view class="modal-btn-wrap w-full flex flex-col gap-2">
+        <view class="modal-btn confirm-btn" hover-class="btn-active" bindtap="onSearch">立即查券</view>
+        <view class="modal-btn ignore-btn" bindtap="onIgnoreClipboard">取消</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 查券结果弹窗 Modal -->
+  <view class="modal-overlay" wx:if="{{showResultModal}}">
+    <view class="modal-content result-modal">
+      <!-- 右上角关闭 X -->
+      <view class="modal-close-btn" bindtap="closeResultModal">
+        <text class="modal-close-icon">×</text>
+      </view>
+
+      <block wx:if="{{!showCopyGuide}}">
+        <!-- 商品信息区（有商品数据时才展示） -->
+        <view class="result-goods-info" wx:if="{{resultModalData.title}}">
+          <image class="result-goods-img" src="{{resultModalData.image_url}}" mode="aspectFill"></image>
+          <view class="result-goods-title line-clamp-2">{{resultModalData.title}}</view>
+        </view>
+
+        <!-- 提示语区域 -->
+        <view class="result-compliance-msg">
+          <!-- 有券 -->
+          <block wx:if="{{resultModalData.hasCoupon}}">
+            <text>恭喜，该商品查到更多优惠，您可复制后返回原APP下单。</text>
           </block>
+          <!-- 无券 -->
           <block wx:else>
-            <view class="subsidy-alert-box">
-              <view class="subsidy-alert-title">✨ 发现政府补贴 / 大促活动</view>
-              <view class="subsidy-alert-desc">该商品含有特殊补贴或立减，因数据限制未展示面额，请点击下方按钮直接前往淘宝查看最低价！</view>
-            </view>
+            <text>很遗憾，该商品暂无更多优惠，您可复制后返回原APP下单。</text>
           </block>
         </view>
-      </view>
-      <view class="sheet-action">
-        <button class="buy-btn" bindtap="gotoBuy">
-          <image class="btn-icon" src="/images/icons/external_link.png" mode="aspectFit"></image>
-          <text>立即领券</text>
-        </button>
-      </view>
-      <view class="sheet-footer">
-        <image class="footer-icon" src="/images/icons/shield_check.png" mode="aspectFit"></image>
-        <text class="footer-text">点击将跳转至淘宝官方APP完成购买</text>
-      </view>
-    </view>
-  </view>
-  <!-- 剪贴板检测弹窗 -->
-  <view class="fadeIn" wx:if="{{showClipboardPopup}}">
-    <view class="weui-mask" bindtap="closeClipboardPopup"></view>
-    <view class="custom-dialog">
-      <view class="custom-dialog__title">检测到商品链接</view>
-      <view class="custom-dialog__desc">是否立即查询该商品的优惠信息？</view>
-      <view class="custom-dialog__actions">
-        <view class="btn-cancel" bindtap="closeClipboardPopup">稍后查询</view>
-        <view class="btn-confirm" bindtap="confirmClipboardPopup">立即查券</view>
-      </view>
+
+        <!-- 按钮区域 -->
+        <view class="modal-btn-wrap w-full flex flex-col gap-2">
+          <view 
+            class="modal-btn confirm-btn" 
+            bindtap="{{resultModalData.platform === 'jd' ? 'copyAndOpenJd' : 'copyAndOpenTaobao'}}">
+            复制返回原APP下单
+          </view>
+          <view class="modal-btn ignore-btn" bindtap="closeResultModal">取消</view>
+        </view>
+      </block>
+
+      <!-- 复制成功后的引导页 -->
+      <block wx:else>
+        <view class="copy-guide-wrap flex flex-col items-center gap-4 py-6 w-full">
+          <icon type="success" size="64" color="#07C160"></icon>
+          <view class="font-bold text-lg mt-2">复制成功！</view>
+          <view class="text-gray-500 text-center leading-relaxed">
+            <text>优惠口令已保存至剪贴板\n请直接打开 <text class="font-bold text-orange-500">{{resultModalData.platform === 'jd' ? '京东' : '手机淘宝'}}</text> App\n等待几秒即可自动弹出口令</text>
+          </view>
+          <view class="modal-btn confirm-btn w-full mt-6" bindtap="closeResultModal">我知道了</view>
+        </view>
+      </block>
     </view>
   </view>
 
-  <!-- 无优惠券提示弹窗 -->
-  <view class="fadeIn" wx:if="{{showNoCouponPopup}}">
-    <view class="weui-mask" bindtap="closeNoCouponPopup"></view>
-    <view class="custom-dialog custom-dialog--no-coupon">
-      <image class="frown-icon" src="/images/icons/frown.png" mode="aspectFit"></image>
-      <view class="custom-dialog__title">暂无优惠券信息</view>
-      <view class="custom-dialog__actions no-coupon-action">
-        <view class="btn-confirm w-full" bindtap="closeNoCouponPopup">我知道了</view>
-      </view>
-    </view>
-  </view>
-
-  <!-- 淘口令领券专属弹窗 (按需渲染) -->
-  <view class="tkl-popup-wrap" wx:if="{{showTklPopup}}">
-    <view class="tkl-overlay" bindtap="closeTklPopup"></view>
-    <view class="tkl-box">
-      <view class="tkl-header">专属补贴已备好</view>
-      <view class="tkl-body">
-        <view class="tkl-desc" wx:if="{{hasCoupon}}">已为您生成极速补贴链接/口令：</view>
-        <view class="tkl-desc" wx:else>暂无优惠信息，通过专属口令购买可获得积分：</view>
-        <text class="tkl-code" user-select="true">{{generatedTkl}}</text>
-        <view class="tkl-notice">【注意】由于平台策略，请您点击“立刻复制”后，直接打开手机淘宝的顶部搜索框进行粘贴。</view>
-      </view>
-      <view class="tkl-footer">
-        <view class="tkl-btn tkl-cancel" bindtap="closeTklPopup">取消</view>
-        <view class="tkl-btn tkl-confirm" bindtap="onCopyTkl">立刻复制</view>
-      </view>
-    </view>
-  </view>
 </view>

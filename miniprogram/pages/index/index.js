@@ -1,211 +1,231 @@
-const { formatMoneyToPoints } = require('../../utils/format');
+import { API } from '../../utils/api';
 
 Page({
   data: {
-    searchQuery: '',
-    hasResult: false,
-    showResult: false,
-    showClipboardPopup: false,
-    showNoCouponPopup: false,
-    result: {},
-    theme: 'light'
+    inputValue: '',
+    showClipboard: false,
+    clipboardText: '',
+    lastCheckedClipboard: ''
   },
 
-  onLoad() {
-    const app = getApp();
-    this.setData({
-      theme: wx.getSystemInfoSync().theme || 'light',
-      navHeight: app.globalData.navHeight,
-      statusBarHeight: app.globalData.statusBarHeight
-    });
+  onLoad: function (options) {
+    // 页面初始化
   },
 
-  onShow() {
+  onShow: function () {
     this.checkClipboard();
   },
 
-  onHide() {
-    this.setData({
-      showResult: false,
-      showClipboardPopup: false,
-      showNoCouponPopup: false
-    });
-  },
-
-  checkClipboard() {
+  checkClipboard: function () {
     wx.getClipboardData({
       success: (res) => {
         const text = res.data;
-        if (text && this.isEcommerceLink(text)) {
-          if (text === this.lastProcessedText) return;
-
-          this.pendingParseText = text;
-          this.setData({
-            showClipboardPopup: true
-          });
-        }
-      }
-    });
-  },
-
-  isEcommerceLink(text) {
-    const urlPatterns = [/jd\.com/i, /taobao\.com/i, /tmall\.com/i, /tb\.cn/i, /yangkeduo\.com/i, /pinduoduo\.com/i, /vip\.com/i, /https?:\/\//i];
-    const tklPattern = /[￥$€₤₳¢¤(《][a-zA-Z0-9\+]{8,15}[￥$€₤₳¢¤)》]/;
-    const keywords = ['淘宝', '天猫', '京东', '拼多多', '唯品会', '复制这段', '打开APP'];
-    
-    return urlPatterns.some(p => p.test(text)) || 
-           tklPattern.test(text) || 
-           keywords.some(k => text.includes(k));
-  },
-
-  onInputChange(e) {
-    this.setData({
-      searchQuery: e.detail.value
-    });
-  },
-
-  clearSearch() {
-    this.setData({ searchQuery: '' });
-  },
-
-  closeClipboardPopup() {
-    this.lastProcessedText = this.pendingParseText;
-    this.pendingParseText = '';
-    this.setData({ showClipboardPopup: false });
-  },
-
-  confirmClipboardPopup() {
-    const text = this.pendingParseText;
-    this.setData({ showClipboardPopup: false });
-    this.parseLink(text);
-  },
-
-  closeNoCouponPopup() {
-    this.setData({ showNoCouponPopup: false });
-  },
-
-  onSearch() {
-    const query = this.data.searchQuery || this.data.clipboardText;
-    if (!query) {
-      wx.showToast({ title: '请输入链接', icon: 'none' });
-      return;
-    }
-    this.parseLink(query);
-  },
-
-
-  // 核心查券逻辑：不再清洗，直接发送原始文案！
-  parseLink(text) {
-    wx.showLoading({ title: '正在呼叫查券引擎...' });
-    wx.cloud.callFunction({
-      name: 'parse_and_convert',
-      data: { query: text }, // 👈 原汁原味地把整段话发给云函数
-      success: (res) => {
-        const resData = res.result;
-        
-        if (resData && resData.success) {
-          const goods = resData.data; 
-          
-          // 如果返回的商品信息为空，或者价格为0，说明没有优惠券
-          // 修改验证逻辑：只要有 title 和 jump_url，我们就允许展示（即使 price 是 0，以此兼容国补商品兜底）
-          if (!goods || !goods.title || !goods.jump_url) {
-            this.setData({ showNoCouponPopup: true });
-            return;
+        if (text && text !== this.data.lastCheckedClipboard) {
+          this.setData({ lastCheckedClipboard: text });
+          const parsed = this.parseQuery(text);
+          // 只有当识别到是链接或口令时，才弹出截获弹窗
+          if (parsed.query_type !== 'keyword') {
+            this.setData({
+              showClipboard: true,
+              clipboardText: text
+            });
           }
-
-          const estimatedCommission = parseFloat(goods.price) * 0.1;
-          const points = formatMoneyToPoints(estimatedCommission);
-          const origin = (parseFloat(goods.price) + parseFloat(goods.coupon || 0)).toFixed(2);
-
-          this.setData({
-            hasResult: true,
-            showResult: true,
-            result: {
-              title: goods.title,
-              img: goods.image,       
-              originPrice: origin, 
-              couponPrice: goods.price, 
-              points: points,
-              tkl: goods.tkl,         
-              jump_url: goods.jump_url,
-              subsidy: goods.subsidy || false
-            }
-          });
-          this.lastProcessedText = text;
-        } else {
-          this.setData({ showNoCouponPopup: true });
         }
       },
-      fail: (err) => {
-        console.error('云函数调用失败', err);
-        wx.showToast({ title: '网络信号弱，请重试', icon: 'none' });
-      },
-      complete: () => {
-        wx.hideLoading();
-      }
+      fail: () => {}
     });
   },
 
-  closeResult() {
-    this.setData({ showResult: false });
+  parseQuery: function (text) {
+    if (!text) return { platform: 'auto', query_type: 'keyword' };
+    
+    // 1. 京东判定
+    const isJd = /jd\.com|jingxi\.com|jd\.hk|3\.cn|jingdong\.com/i.test(text) || /京东/.test(text) || /jkl=/i.test(text);
+    if (isJd) {
+      // 京东链接
+      if (/(https?:\/\/[^\s]+)/i.test(text) || /(jd\.com|3\.cn)/i.test(text)) {
+        return { platform: 'jd', query_type: 'url' };
+      }
+      // 京东口令 (常见格式：jkl=... 或 ( ... ))
+      if (/jkl=[a-zA-Z0-9]+/i.test(text) || /\([a-zA-Z0-9]{11}\)/.test(text)) {
+        return { platform: 'jd', query_type: 'tkl' };
+      }
+      return { platform: 'jd', query_type: 'keyword' };
+    }
+    
+    // 2. 淘宝判定
+    const isTaobao = /taobao\.com|tmall\.com|tb\.cn/i.test(text) || /tk=/i.test(text) || /[￥$($)《》【】]/i.test(text);
+    if (isTaobao) {
+      // 淘宝链接
+      if (/(https?:\/\/[^\s]+)/i.test(text) || /(taobao\.com|tmall\.com|tb\.cn)/i.test(text)) {
+        return { platform: 'taobao', query_type: 'url' };
+      }
+      // 淘宝口令
+      return { platform: 'taobao', query_type: 'tkl' };
+    }
+    
+    return { platform: 'auto', query_type: 'keyword' };
   },
 
-  gotoBuy() {
-    const tkl = this.data.result.tkl;
-    const jumpUrl = this.data.result.jump_url;
-    let uiDisplayTkl = tkl;
-    let actualClipboardData = tkl;
-    
-    // 如果由于商品无佣金等原因拿不到真实短口令，不再直接展示一长串英文破坏UI排版！
-    // 而是展示一个符合格式的“专属直通口令”，并在剪贴板里偷偷置入真正能唤起淘宝的jump_url
-    if (!tkl && jumpUrl && jumpUrl.startsWith('http')) {
-      uiDisplayTkl = "￥免佣直达绝密口令￥";
-      actualClipboardData = jumpUrl; 
-    } else if (!tkl && !jumpUrl) {
-      wx.showToast({ title: '链接生成失败，请重试', icon: 'none' });
+  onInput: function(e) {
+    this.setData({
+      inputValue: e.detail.value
+    });
+  },
+
+  onClearInput: function() {
+    this.setData({
+      inputValue: ''
+    });
+  },
+
+  onIgnoreClipboard: function() {
+    this.setData({
+      inputValue: this.data.clipboardText,
+      showClipboard: false,
+      clipboardText: ''
+    });
+  },
+
+  onSearch: async function() {
+    // 优先使用弹窗中的截获内容，如果没有则使用输入框内容
+    const textToSearch = this.data.showClipboard ? this.data.clipboardText : this.data.inputValue;
+    const cleanText = (textToSearch || '').trim();
+
+    if (!cleanText) {
+      wx.showToast({ title: '请输入商品链接或口令', icon: 'none' });
       return;
     }
 
-    // Determine if it actually has a coupon (based on existing logic)
-    const hasCoupon = parseFloat(this.data.result.couponPrice || 404) < parseFloat(this.data.result.originPrice || 0) && parseFloat(this.data.result.couponPrice) !== 0;
+    // 关闭弹窗
+    if (this.data.showClipboard) {
+      this.setData({ showClipboard: false });
+    }
 
-    // Show custom TKL Popup and hide existing result sheet
-    this.setData({
-      showResult: false,
-      showTklPopup: true,
-      generatedTkl: uiDisplayTkl,
-      actualClipboardData: actualClipboardData, // 缓存真实必须复制的数据
-      hasCoupon: hasCoupon
-    });
-  },
+    const parsed = this.parseQuery(cleanText);
+    
+    // 如果是京东/淘宝的链接或口令，直接调用云函数查券并弹出弹窗
+    if (parsed.query_type === 'url' || parsed.query_type === 'tkl') {
+      wx.showLoading({ title: '正在查询优惠...', mask: true });
+      try {
+        // 核心：直接传递原文案，让后端 API 进行智能识别和编码处理
+        const res = await API.searchCoupon({
+          query: cleanText, 
+          query_type: parsed.query_type,
+          platform: parsed.platform
+        });
+        wx.hideLoading();
 
-  closeTklPopup() {
-    this.setData({ showTklPopup: false });
-  },
-
-  onCopyTkl() {
-    const copyData = this.data.actualClipboardData || this.data.generatedTkl;
-    if (!copyData) return;
-
-    // Synchronous execution avoids wx system intercept bug on some devices
-    wx.setClipboardData({
-      data: String(copyData),
-      success: () => {
-        // wx naturally shows green toast
-        this.setData({ showTklPopup: false });
-      },
-      fail: (err) => {
-        console.error('真实复制报错', err);
-        wx.showToast({ title: '自动复制失败，请长按口令手动复制', icon: 'none', duration: 3000 });
+        if (res && res.items && res.items.length > 0) {
+          const item = res.items[0];
+          // 为京东的小程序 <navigator> 跳转提前准备好 encode 后的短链
+          if (item.platform === 'jd' && item.short_url) {
+            item.encodedUrl = encodeURIComponent(item.short_url);
+          }
+          this.setData({
+            showResultModal: true,
+            showCopyGuide: false,
+            resultModalData: item,
+            showClipboard: false
+          });
+          // 记录历史足迹
+          this.saveFootprint(item);
+        } else {
+          // 无优惠券 → 仍弹窗，展示平台对应的提示和按钮
+          this.setData({
+            showResultModal: true,
+            showCopyGuide: false,
+            resultModalData: {
+              hasCoupon: false,
+              platform: parsed.platform === 'auto' ? 'taobao' : parsed.platform,
+              title: '',
+              image_url: '',
+              original_url: cleanText
+            },
+            showClipboard: false
+          });
+        }
+        return;
+      } catch (err) {
+        wx.hideLoading();
+        // 区分"没找到商品"(code -3) vs 真正的服务异常
+        const errMsg = err.message || '';
+        if (errMsg.includes('没有找到') || errMsg.includes('未找到') || errMsg.includes('搜索内容不能为空')) {
+          this.setData({
+            showResultModal: true,
+            showCopyGuide: false,
+            resultModalData: {
+              hasCoupon: false,
+              platform: parsed.platform === 'auto' ? 'taobao' : parsed.platform,
+              title: '',
+              image_url: '',
+              original_url: cleanText // 保存原链接用于兜底跳转/复制
+            },
+            showClipboard: false
+          });
+        } else {
+          wx.showToast({ title: '查券服务暂时不可用', icon: 'none' });
+        }
+        return;
       }
+    }
+
+    // 纯文本关键词，跳转到搜索结果页列表
+    wx.navigateTo({
+      url: `/pages/search-result/search-result?keyword=${encodeURIComponent(cleanText)}&query_type=${parsed.query_type}&platform=${parsed.platform}`
     });
   },
 
-  onShareAppMessage() {
-    const price = this.data.result.couponPrice ? `券后只要 ${this.data.result.couponPrice} 元！` : '快来帮我看看这个好东西！';
-    return {
-      title: `我看中了这个商品，${price}`,
-      path: '/pages/index/index'
-    };
+  closeResultModal: function() {
+    this.setData({ showResultModal: false, showCopyGuide: false });
+  },
+
+  copyAndOpenTaobao: function() {
+    const data = this.data.resultModalData;
+    const copyText = (data && data.tkl) ? data.tkl : (data && data.original_url ? data.original_url : this.data.inputValue);
+    if (copyText) {
+      wx.setClipboardData({
+        data: copyText,
+        success: () => {
+          this.setData({ showCopyGuide: true });
+        }
+      });
+    } else {
+      wx.showToast({ title: '内容获取失败', icon: 'none' });
+    }
+  },
+
+
+  copyAndOpenJd: function() {
+    const data = this.data.resultModalData;
+    const copyText = (data && data.short_url) ? data.short_url : (data && data.original_url ? data.original_url : this.data.inputValue);
+    if (copyText) {
+      wx.setClipboardData({
+        data: copyText,
+        success: () => {
+          this.setData({ showCopyGuide: true });
+        }
+      });
+    } else {
+      wx.showToast({ title: '内容获取失败', icon: 'none' });
+    }
+  },
+
+  saveFootprint: function(item) {
+    wx.cloud.callFunction({
+      name: 'cf-user-assets',
+      data: {
+        action: 'addFootprint',
+        item: {
+          tao_id: item.tao_id,
+          title: item.title,
+          image_url: item.image_url,
+          platform: item.platform,
+          original_price: item.original_price,
+          coupon_price: item.coupon_price,
+          coupon_amount: item.couponAmount || item.coupon_amount || 0
+        }
+      }
+    }).catch(console.error);
   }
 });

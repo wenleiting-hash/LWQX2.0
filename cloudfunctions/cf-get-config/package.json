@@ -1,0 +1,9 @@
+{
+  "name": "cf-get-config",
+  "version": "1.0.0",
+  "description": "Reads system_config and filters sensitive fields",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

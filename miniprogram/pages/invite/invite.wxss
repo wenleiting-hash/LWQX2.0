@@ -1,0 +1,166 @@
+.container {
+  min-height: 100vh;
+  background-color: #F8F8F8;
+}
+
+.pb-safe {
+  padding-bottom: calc(40rpx + env(safe-area-inset-bottom));
+}
+
+/* 顶部渐变与插画背景 */
+.header-bg {
+  position: relative;
+  width: 100%;
+  height: 400rpx;
+  background: linear-gradient(180deg, #FF6200, #FF8A2B);
+  border-radius: 0 0 40rpx 40rpx;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: #FFFFFF;
+}
+
+.header-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.1;
+}
+
+.header-content {
+  position: relative;
+  z-index: 10;
+  text-align: center;
+}
+
+.title {
+  font-size: 56rpx;
+  font-weight: 900;
+  margin-bottom: 16rpx;
+  text-shadow: 0 4rpx 8rpx rgba(0,0,0,0.1);
+}
+
+.subtitle {
+  font-size: 28rpx;
+  opacity: 0.9;
+}
+
+/* 专属海报卡片 */
+.invite-card {
+  background-color: #FFFFFF;
+  margin: -40rpx 32rpx 24rpx;
+  border-radius: 32rpx;
+  padding: 32rpx;
+  box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.03);
+  position: relative;
+  z-index: 20;
+}
+
+.card-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333333;
+  margin-bottom: 24rpx;
+  text-align: center;
+}
+
+.poster-preview {
+  width: 100%;
+  height: 600rpx;
+  background-color: #F5F5F5;
+  border-radius: 16rpx;
+  margin-bottom: 32rpx;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.poster-img {
+  width: 100%;
+  height: 100%;
+}
+
+.poster-placeholder {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #FFF0E5, #FFE4D6);
+}
+
+.placeholder-text {
+  font-size: 28rpx;
+  color: #FF8C00;
+  font-weight: bold;
+}
+
+.btn-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  gap: 24rpx;
+}
+
+.btn-share {
+  background: linear-gradient(90deg, #FF8A2B, #FF6200);
+  color: #FFFFFF;
+  font-size: 32rpx;
+  font-weight: bold;
+  border-radius: 100rpx;
+  width: 80% !important;
+  height: 88rpx;
+  line-height: 88rpx;
+  box-shadow: 0 8rpx 24rpx rgba(255, 98, 0, 0.3);
+  margin: 0 auto !important;
+}
+
+.btn-share::after {
+  border: none;
+}
+
+.btn-save {
+  background-color: #FFF0E5;
+  color: #FF6200;
+  font-size: 32rpx;
+  font-weight: bold;
+  border-radius: 100rpx;
+  width: 80% !important;
+  height: 88rpx;
+  line-height: 88rpx;
+  border: 2rpx solid rgba(255, 98, 0, 0.2);
+  margin: 0 auto !important;
+}
+
+.btn-save::after {
+  border: none;
+}
+
+/* 邀请规则 */
+.rule-box {
+  background-color: #FFFFFF;
+  margin: 0 32rpx 24rpx;
+  border-radius: 32rpx;
+  padding: 32rpx;
+  box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.03);
+}
+
+.rule-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333333;
+  margin-bottom: 24rpx;
+}
+
+.rule-item {
+  font-size: 26rpx;
+  color: #666666;
+  line-height: 1.6;
+  margin-bottom: 12rpx;
+}

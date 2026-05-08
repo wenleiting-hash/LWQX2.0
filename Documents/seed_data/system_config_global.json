@@ -1,0 +1,52 @@
+{
+  "_id": "global_config",
+  
+  "__doc__": "LWQX 3.0 全局配置 · PRD-07 §7.6.1",
+  "__warning__": "ztk_appkey/taobao_pid/jd_appkey/jd_secret/jd_union_id/jd_position_id 严禁返回前端",
+
+  "ztk_appkey": "YOUR_ZTK_APPKEY_HERE",
+  "taobao_pid": "YOUR_TAOBAO_PID_HERE",
+  
+  "jd_appkey": "",
+  "jd_secret": "",
+  "jd_union_id": "",
+  "jd_position_id": "",
+
+  "theme_color": "#FF5500",
+
+  "nickname_pool": [
+    "省钱达人",
+    "小栗鼠用户",
+    "优惠猎手",
+    "精打细算",
+    "薅羊毛高手",
+    "聪明买家",
+    "剁手能手",
+    "白菜价选手",
+    "券后真香",
+    "好物分享官"
+  ],
+
+  "service_qrcode_url": "",
+  "service_wechat_id": "",
+
+  "announcement": {
+    "enabled": false,
+    "title": "",
+    "content": ""
+  },
+
+  "bulletin_templates": [
+    "{nickname}刚刚查券省了{amount}元",
+    "{nickname}成功找到{title}的隐藏券",
+    "{nickname}领到了{amount}元大额优惠券"
+  ],
+
+  "review_mode": {
+    "enabled": false,
+    "reason": ""
+  },
+
+  "created_at": "2026-04-23T23:27:00+08:00",
+  "updated_at": "2026-04-23T23:27:00+08:00"
+}

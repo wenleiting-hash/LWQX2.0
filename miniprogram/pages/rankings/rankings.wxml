@@ -1,0 +1,108 @@
+<view class="rankings-container pb-safe">
+  
+  <!-- Header WITHOUT Platform Switch -->
+  <view class="header-section bg-orange-50">
+  </view>
+
+  <view class="main-content-wrapper">
+    <!-- Grid Navigation (金刚区) - Row 1 -->
+    <view class="grid-nav-card">
+      <view class="grid-row-4">
+        <view class="grid-item" wx:for="{{ranksRow1}}" wx:key="id" hover-class="active-scale" bindtap="onRankClick" data-id="{{item.id}}">
+          <view class="icon-wrapper bg-orange-50">
+            <view class="icon-lucide {{item.iconClass}} text-brand" />
+          </view>
+          <text class="icon-text text-gray-600 font-medium">{{item.name}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- Row 2: 3 Items (Promo Cards) -->
+    <view class="grid-row-3-cards">
+      <view class="row3-card bg-orange-50" wx:for="{{ranksRow2}}" wx:key="id" hover-class="active-scale" bindtap="onRankClick" data-id="{{item.id}}">
+        <view class="icon-lucide {{item.iconClass}} row3-card-icon text-brand" />
+        <text class="row3-card-text text-gray-900">{{item.name}}</text>
+        <text class="row3-card-sub text-gray-400">{{item.subtitle}}</text>
+      </view>
+    </view>
+
+    <!-- Row 3: Feed Tabs -->
+    <view class="hot-tabs-container">
+      <view class="hot-tab-item {{platform === item.id ? 'tab-active' : ''}}" wx:for="{{hotTabs}}" wx:key="id" bindtap="onTabChange" data-pf="{{item.id}}">
+        <text class="hot-tab-text">{{item.name}}</text>
+      </view>
+    </view>
+
+    <!-- Item List -->
+    <view class="rank-list">
+      <!-- Data Items -->
+      <block wx:if="{{!isLoading}}">
+        <view class="list-item" wx:for="{{items}}" wx:key="tao_id" hover-class="active-scale" bindtap="goToDetail" data-item="{{item}}">
+
+          <!-- Big Number Indicator -->
+          <view class="top-number {{index === 0 ? 'top-1' : index === 1 ? 'top-2' : index === 2 ? 'top-3' : 'top-other'}}">{{index + 1}}</view>
+
+          <!-- Product Image -->
+          <view class="item-img-wrapper">
+            <image class="item-img" src="{{item.image_url}}" mode="aspectFill" lazy-load="{{true}}"></image>
+            <view class="platform-tag" style="background-color: rgba(255,98,0,0.9);">{{item.platform === 'taobao' ? '淘宝' : '京东'}}</view>
+          </view>
+
+          <!-- Product Info -->
+          <view class="item-info">
+            <view class="item-title line-clamp-2 text-gray-900 font-bold">{{item.title}}</view>
+
+            <view class="item-coupon-row">
+              <view class="coupon-tag border-brand-20" style="background-color: rgba(255,98,0,0.05);">
+                <text class="coupon-txt text-brand">券</text>
+                <text class="coupon-val text-brand">¥{{item.coupon_amount}}</text>
+              </view>
+              <view class="text-xs text-gray-400" style="margin-left: 16rpx;">已售 {{item.sales_num}}</view>
+            </view>
+
+            <view class="item-price-row">
+              <view class="price-box">
+                <text class="price-symbol text-brand">¥</text>
+                <text class="price-val text-brand">{{item.coupon_price}}</text>
+                <text class="price-ori text-gray-400">¥{{item.original_price}}</text>
+              </view>
+              <view class="buy-btn" hover-class="active-scale">领券抢购</view>
+            </view>
+
+          </view>
+        </view>
+      </block>
+
+      <!-- Skeleton Items (Loading State) -->
+      <block wx:else>
+        <view class="list-item" wx:for="{{[1,2,3,4,5]}}" wx:key="*this">
+          <view class="skeleton-block" style="width: 48rpx; height: 48rpx; border-radius: 24rpx;"></view>
+          <view class="item-img-wrapper">
+            <view class="skeleton-block" style="width: 100%; height: 100%; border-radius: 0;"></view>
+          </view>
+          <view class="item-info">
+            <view class="skeleton-block" style="width: 100%; height: 28rpx; margin-bottom: 12rpx;"></view>
+            <view class="skeleton-block" style="width: 70%; height: 28rpx; margin-bottom: 24rpx;"></view>
+            <view class="skeleton-block" style="width: 100rpx; height: 32rpx; margin-bottom: 20rpx; border-radius: 8rpx;"></view>
+            <view style="display: flex; justify-content: space-between; align-items: center;">
+              <view class="skeleton-block" style="width: 140rpx; height: 36rpx;"></view>
+              <view class="skeleton-block" style="width: 120rpx; height: 56rpx; border-radius: 28rpx;"></view>
+            </view>
+          </view>
+        </view>
+      </block>
+
+      <!-- Empty State -->
+      <view class="text-center py-6 text-gray-400 text-xs" wx:if="{{!isLoading && items.length === 0}}">
+        暂无上榜商品~
+      </view>
+      <!-- Bottom Loading Indicator -->
+      <view class="text-center py-6 text-gray-400 text-xs" wx:if="{{!isLoading && !hasMore && items.length > 0}}">
+        已经到底啦~
+      </view>
+      <view class="flex justify-center py-4" wx:if="{{isLoadingMore}}">
+        <view class="w-5 h-5 border-2 border-[#FF6200] border-t-transparent rounded-full animate-spin"></view>
+      </view>
+    </view>
+  </view>
+</view>

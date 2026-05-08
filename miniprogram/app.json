@@ -2,24 +2,33 @@
   "pages": [
     "pages/index/index",
     "pages/discover/discover",
-    "pages/orders/orders",
-    "pages/mine/mine",
-    "pages/categorylist/categorylist",
-    "pages/webview/webview",
-    "pages/points_detail/points_detail",
+    "pages/rankings/rankings",
     "pages/community/community",
-    "pages/guide/guide"
+    "pages/mine/mine",
+    "pages/detail/detail",
+    "pages/search-result/search-result",
+    "pages/faq/faq",
+    "pages/categorylist/categorylist",
+    "pages/guide/guide",
+    "pages/history/history",
+    "pages/promo/promo",
+    "pages/ranking-list/ranking-list",
+    "pages/invite/invite",
+    "pages/contact/contact",
+    "pages/favorite/favorite",
+    "pages/join-group/join-group"
   ],
   "window": {
-    "backgroundColor": "#F7F7F7",
+    "backgroundColor": "#F5F5F5",
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#FFFFFF",
-    "navigationBarTitleText": "首页",
-    "navigationBarTextStyle": "black"
+    "navigationBarTitleText": "小栗鼠",
+    "navigationBarTextStyle": "black",
+    "onReachBottomDistance": 200
   },
   "tabBar": {
-    "color": "#888888",
-    "selectedColor": "#FF6B35",
+    "color": "#9ca3af",
+    "selectedColor": "#FF6200",
     "borderStyle": "white",
     "backgroundColor": "#ffffff",
     "list": [
@@ -27,7 +36,7 @@
         "pagePath": "pages/index/index",
         "iconPath": "images/tabbar/home.png",
         "selectedIconPath": "images/tabbar/home_active.png",
-        "text": "首页"
+        "text": "查券"
       },
       {
         "pagePath": "pages/discover/discover",
@@ -36,10 +45,16 @@
         "text": "发现"
       },
       {
-        "pagePath": "pages/orders/orders",
+        "pagePath": "pages/rankings/rankings",
         "iconPath": "images/tabbar/order.png",
         "selectedIconPath": "images/tabbar/order_active.png",
-        "text": "订单"
+        "text": "榜单"
+      },
+      {
+        "pagePath": "pages/community/community",
+        "iconPath": "images/tabbar/search.png",
+        "selectedIconPath": "images/tabbar/search_active.png",
+        "text": "晒单"
       },
       {
         "pagePath": "pages/mine/mine",
@@ -53,5 +68,8 @@
   "sitemapLocation": "sitemap.json",
   "lazyCodeLoading": "requiredComponents",
   "darkmode": true,
-  "__usePrivacyCheck__": false
+  "__usePrivacyCheck__": false,
+  "navigateToMiniProgramAppIdList": [
+    "wx91d27dbf599dff74"
+  ]
 }

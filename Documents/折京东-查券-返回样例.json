@@ -1,0 +1,66 @@
+  {
+	                            "status": 200,                      /*状态*/
+	                            "content": [{
+		                            "code": "6646",                 /*折京客编号*/
+		                            "type_one_id": "1",             /*分类ID，可参考折京客分类*/
+		                            "tao_id": "554832820990",       /*商品ID*/
+		                            "title": "储物箱整理抽屉式收纳柜",                   /*商品短标题*/
+		                            "jianjie": "【爆款返场，出口日本】进口PP材质，可叠加透明可视抽屉收纳盒，分格抽屉物品分类齐全，区域分化一目了然，自由组合，大容量，让你居家生活更舒心，收纳你的生活！【赠运费险】", /*商品简介*/
+		                            "pict_url": "https://img14.360buyimg.com/bao/......jpg",                   /*商品主图*/
+		                            "user_type": "0",                   /*是否京东自营，0是非京东自营，1是京东自营*/
+		                            "seller_id": "953997",                   /*卖家ID*/ /*店铺地址可自行拼接，https://mall.jd.com/index-953997.html */
+		                            "shop_dsr": "4.80",                   /*商品描述分*/
+		                            "volume": "169",                   /*月销量*/
+		                            "size": "26.90",                   /*折扣价*/
+		                            "quanhou_jiage": "16.90",                   /*券后价*/
+		                            "date_time_yongjin": "2018/11/8 14:45:22",                   /*数据更新时间*/
+		                            "tkrate3": "30.00",                   /*佣金比率*/
+		                            "yongjin_type": "MKT",                   /*佣金类型*/
+		                            "coupon_id": "fe31d6c8132c462ba59bd72e03d2eae0",                   /*优惠券ID*/
+		                            "coupon_start_time": "2018-11-05",                   /*优惠券开始时间*/
+		                            "coupon_end_time": "2018-11-10",                   /*优惠券结束时间*/
+		                            "coupon_info_money": "10",                   /*优惠券金额*/
+		                            "coupon_total_count": "100000",                   /*优惠券总数量，目前官方为0，无用*/
+		                            "coupon_remain_count": "99965",                   /*优惠券剩余数量，目前官方为0，无用*/
+		                            "coupon_info": "满80.00元减10元",                   /*优惠券信息*/
+		                            "juhuasuan": "0",                       /*是否京东配送，1是*/
+		                            "taoqianggou": "0",                     /*是否京东拼购，1是*/
+		                            "haitao": "0",                          /*是否海淘（京东国际），1是*/
+		                            "jiyoujia": "0",                        /*是否京喜商品，1是*/
+		                            "jinpaimaijia": "0",                    /*是否京东好店，1是*/
+		                            "pinpai": "0",                          /*是否精选品牌，1是*/
+		                            "pinpai_name": "",                      /*品牌名称*/
+		                            "yunfeixian": "0",                      /*是否有运费险，1有*/
+		                            "nick": "***旗舰店",                    /*卖家昵称*/
+		                            "small_images": "https://img14.360buyimg.com/bao/.......jpg|https://img14.360buyimg.com/bao/.......jpg",                   /*商品小图列表*/
+		                            "white_image": "https://img14.360buyimg.com/bao/......jpg",                   /*商品白底图*/
+		                            "tao_title": "抽屉式收纳箱塑料储物箱整理箱衣服物家用宿舍衣柜内衣内裤收纳盒",                   /*商品长标题*/
+		                            "provcity": "浙江 杭州",                   /*宝贝所在地*/
+		                            "shop_title": "***旗舰店",                   /*店铺名称*/
+		                            "zhibo_url": "https://cloud.video.taobao.com/play/u/849090736/p/2/e/6/t/1/219853683676.mp4",                   /*视频地址*/
+		                            "sellCount": "860000",                   /*网页实时总销量-废弃*/
+		                            "commentCount": "250000",                   /*评论数量*/
+		                            "favcount": "180000",                   /*收藏数量*/
+		                            "score1": "4.9",                   /*宝贝描述分*/
+		                            "score2": "4.9",                   /*卖家服务分*/
+		                            "score3": "4.9",                   /*物流服务分*/
+		                            "creditLevel": "15",                   /*店铺评分*/
+		                            "shopIcon": "//img14.360buyimg.com/imgextra/de/a6/TB10dC8SX.jpg",       /*店铺logo*/
+		                            "pcDescContent": "1.jpg|2.jpg|3.jpg|4.jpg|5.jpg",  /*图文详情图片地址*/
+		                            "item_url": "https://item.jd.com/10025768652616.html",  /*商品url*/
+		                            "category_id": "50006126",                   /*叶子类目id*/
+		                            "category_name": "收纳盒",                   /*叶子类目name*/
+		                            "level_one_category_id": "122928002",                   /*一级类目id*/
+		                            "level_one_category_name": "收纳整理",                   /*一级类目name*/
+		                            "tkfee3": "5.07",                   /*返佣金额*/
+		                            "biaoqian": ""满300元,省30元"",                   /*店铺活动*/
+		                            "tag": "赶紧拯救你厨房的油腻吧😂植护🌿加厚厨房抽纸高密度纤维纸张，吸油💧很不错5包装|￥14.8元💰✔厨房小帮手，用处多多",                   /*朋友圈文案，需要自己进行urldecode*/
+		                            "date_time": "2018/11/8 14:45:22",                   /*数据添加时间*/
+		                            "tkl": "！CBDNX3ngsDQZbxY！ MU5104",                   /*京口令*/ 
+		                            "coupon_click_url": "https://union-click.jd.com/jdc?e=1002294009&p=",                   /*推广长链接*/
+		                            "shorturl": "https://u.jd.com/JdIOWzt"                   /*推广短链接*/
+	                            }]
+                            }
+
+                            /*shorturl为自己的推广短链接*/
+                            /*coupon_click_url为自己的推广长链接*/

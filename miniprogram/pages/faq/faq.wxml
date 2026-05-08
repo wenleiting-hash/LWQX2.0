@@ -1,0 +1,28 @@
+<view class="container pb-safe">
+  <scroll-view class="scroll-content" scroll-y="{{true}}">
+    
+    <!-- 问题分类区块 -->
+    <view class="faq-group" wx:for="{{faqGroups}}" wx:key="id" wx:for-item="group">
+      <view class="group-title">{{group.name}}</view>
+      <!-- 手风琴列表 -->
+      <view class="faq-list">
+        <view class="faq-item {{expandedId === item.id ? 'expanded' : ''}}" wx:for="{{group.items}}" wx:key="id" bindtap="toggleFaq" data-id="{{item.id}}">
+          <view class="faq-question">
+            <text class="q-text">{{item.q}}</text>
+            <view class="icon-chevron {{expandedId === item.id ? 'rotated' : ''}}"></view>
+          </view>
+          <view class="faq-answer" wx:if="{{expandedId === item.id}}">
+            <text class="a-text">{{item.a}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 底部求助 -->
+    <view class="help-section">
+      <view class="help-title">没有找到答案？</view>
+      <view class="help-btn" bindtap="contactService" hover-class="help-btn-hover">联系专属客服</view>
+    </view>
+
+  </scroll-view>
+</view>

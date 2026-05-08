@@ -1,133 +1,177 @@
-const app = getApp();
+import { API } from '../../utils/api';
 
 Page({
   data: {
-    statusBarHeight: 20,
-    navHeight: 44,
-    navBarPad: 0,
-    userInfo: {
-      avatarUrl: '',
-      nickName: '',
-      level: 'Lv.1 轻省达人',
-      totalSaved: '0.00',
-      availablePoints: '0'
+    stats: {
+      saveAmount: '0.00',
+      couponCount: '0'
     },
-    shopInfo: {
-      title: '佳友栈老温 视频号店',
-      desc: '积分全额兑换 或 积分抵扣换购健康好物'
-    },
-    inviteCard: {
-      id: 'invite',
-      title: '邀请好友 一起省钱',
-      desc: '好友首次查券，各得 500 积分',
-      iconPath: '/images/icons/user_plus.png',
-      bg: '#FFF0E8'
-    },
+    recentHistory: [],
     menuList: [
-      { id: 'details', title: '积分明细', desc: '每一笔获取与消耗记录', iconPath: '/images/icons/list_ordered.png', bg: '#FFF0E8' },
-      { id: 'community', title: '加入老温私域社群', desc: '专属隐藏福利与健康交流', iconPath: '/images/icons/message_circle.png', bg: '#E6F7ED' },
-      { id: 'guide', title: '使用说明', desc: '查券、提分、兑换全攻略', iconPath: '/images/icons/circle_help.png', bg: '#EBF3FF' }
-    ],
-    shareConfig: {
-      title: '还在原价网购？快来这里查隐藏优惠券，边省边赚！',
-      path: '/pages/index/index'
-    },
-    showAuthModal: false
+      { id: 'favorite', name: '我的收藏', subname: '收藏的好物都在这里', iconClass: 'icon-heart-circle', iconBg: 'rgba(255,98,0,0.1)', iconColor: '#FF6200', hasArrow: true },
+      { id: 'tutorial', name: '使用教程', subname: '手把手教你查券省钱', iconClass: 'icon-smartphone-circle', iconBg: 'rgba(255,98,0,0.1)', iconColor: '#FF6200', hasArrow: true },
+      { id: 'community', name: '加入社群', subname: '扫码加入官方交流群', iconClass: 'icon-users', iconBg: 'rgba(255,98,0,0.1)', iconColor: '#FF6200', hasArrow: true },
+      { id: 'contact', name: '联系我们', subname: '专属客服为你解答', iconClass: 'icon-message-circle', iconBg: 'rgba(255,98,0,0.1)', iconColor: '#FF6200', hasArrow: true },
+      { id: 'faq', name: '常见问题', subname: '解答日常查券疑问', iconClass: 'icon-help-circle', iconBg: 'rgba(255,98,0,0.1)', iconColor: '#FF6200', hasArrow: true }
+    ]
+  },
+  
+  onLoad: function() {
+    this.silentLogin();
+  },
+  
+  async onShow() {
+    getApp().cleanExpiredStorage();
+    // 优先计算本地以保证秒出数据
+    this.calculateLocalStats();
+    // 节流：5分钟内不重复同步云端
+    const now = Date.now();
+    if (!this._lastSync || now - this._lastSync > 5 * 60 * 1000) {
+      this._lastSync = now;
+      await this.syncAndMergeFootprints();
+    }
   },
 
-  onLoad() {
-    const { navHeight, statusBarHeight, menuButtonInfo } = app.globalData;
-    const navBarPad = menuButtonInfo ? menuButtonInfo.top - statusBarHeight : 6;
-    this.setData({ navHeight, statusBarHeight, navBarPad });
-  },
-
-  onShow() {
-    this.fetchUserStats();
-  },
-
-  async fetchUserStats() {
-    wx.showNavigationBarLoading();
+  calculateLocalStats() {
     try {
-      // 1. 获取用户统计
-      const statsRes = await wx.cloud.callFunction({
-        name: 'get_user_stats'
-      });
-      if (statsRes.result && statsRes.result.success) {
-        const cloudData = statsRes.result.data;
-        const updateObj = {
-          'userInfo.totalSaved': cloudData.totalSaved,
-          'userInfo.availablePoints': cloudData.availablePoints
-        };
-
-        if (cloudData.userInfo) {
-          updateObj['userInfo.avatarUrl'] = cloudData.userInfo.avatarUrl || '';
-          updateObj['userInfo.nickName'] = cloudData.userInfo.nickName || '未登录';
-          updateObj['userInfo.level'] = cloudData.userInfo.level || '普通会员';
+      const footprints = wx.getStorageSync('footprints') || [];
+      const browseHistory = wx.getStorageSync('browse_history') || [];
+      
+      const allHistory = [...footprints, ...browseHistory];
+      const uniqueItems = [];
+      const seenIds = new Set();
+      
+      allHistory.forEach(item => {
+        const id = item.tao_id || item.id;
+        if (id && !seenIds.has(id)) {
+          seenIds.add(id);
+          uniqueItems.push(item);
         }
-
-        this.setData(updateObj);
-        
-        // 强制阻断未完善资料的用户
-        const cloudAvatar = cloudData.userInfo?.avatarUrl;
-        const cloudNick = cloudData.userInfo?.nickName;
-        
-        if (!cloudAvatar || cloudNick === '新用户' || !cloudNick) {
-          this.setData({ showAuthModal: true });
-        }
-      } else if (statsRes.result && statsRes.result.code === 'NOT_REGISTERED') {
-        // 用户未注册，直接拦截
-        this.setData({ showAuthModal: true });
-      }
-
-      // 2. 获取公共系统配置（运营配置）
-      const configRes = await wx.cloud.callFunction({
-        name: 'get_system_config'
       });
-      if (configRes.result && configRes.result.success && configRes.result.data.operations_config) {
-        const ops = configRes.result.data.operations_config;
-        this.setData({
-          'shareConfig.title': ops.shareText || this.data.shareConfig.title,
-          'shopInfo.url': ops.videoShopUrl || '',
-        });
-      }
 
+      // 按照时间戳倒序排列
+      uniqueItems.sort((a, b) => {
+        const timeA = a.timestamp || a.viewTime || 0;
+        const timeB = b.timestamp || b.viewTime || 0;
+        return timeB - timeA;
+      });
+
+      let totalSave = 0;
+      let count = 0;
+      const recent = [];
+
+      uniqueItems.forEach((item, index) => {
+        // 计算省钱总金额和找券数量
+        let amount = parseFloat(item.coupon_amount) || parseFloat(item.couponAmount) || 0;
+        if (amount > 0) {
+          totalSave += amount;
+          count += 1;
+        }
+        
+        // 提取前4个足迹用于展示
+        if (recent.length < 4) {
+          recent.push({
+            id: item.tao_id || item.id,
+            image: item.image_url || item.image || item.pict_url,
+            price: item.coupon_price || item.price || item.zk_final_price
+          });
+        }
+      });
+
+      this.setData({
+        'stats.saveAmount': totalSave.toFixed(2),
+        'stats.couponCount': count.toString(),
+        recentHistory: recent
+      });
     } catch (e) {
-      console.error('获取同步数据失败:', e);
-    } finally {
-      wx.hideNavigationBarLoading();
+      console.error('Failed to calculate stats', e);
     }
   },
 
-  onMenuClick(e) {
-    const id = e.currentTarget.dataset.id;
-    if (id === 'details') {
-      wx.navigateTo({ url: '/pages/points_detail/points_detail' });
-    } else if (id === 'community') {
-      wx.navigateTo({ url: '/pages/community/community' });
-    } else if (id === 'guide') {
-      wx.navigateTo({ url: '/pages/guide/guide' });
-    } else if (id === 'shop') {
-      wx.showToast({ title: '视频号特权筹备中', icon: 'none' });
+  async syncAndMergeFootprints() {
+    try {
+      const localFootprints = wx.getStorageSync('footprints') || [];
+      if (localFootprints.length > 0) {
+        // 同步本地到云端
+        const recentFootprints = localFootprints.slice(0, 20);
+        await API.userAssets('sync_footprints', { footprints: recentFootprints });
+      }
+
+      // 从云端拉取全量合并
+      const res = await API.userAssets('get_footprints', { page: 1, pageSize: 100 });
+      let cloudItems = [];
+      if (res && res.list) {
+        cloudItems = res.list.map(f => f.item);
+      }
+
+      const allHistory = [...cloudItems, ...localFootprints];
+      const uniqueItems = [];
+      const seenIds = new Set();
+      
+      allHistory.forEach(item => {
+        const id = item.tao_id || item.id;
+        if (id && !seenIds.has(id)) {
+          seenIds.add(id);
+          uniqueItems.push(item);
+        }
+      });
+
+      uniqueItems.sort((a, b) => {
+        const timeA = a.timestamp || a.viewTime || 0;
+        const timeB = b.timestamp || b.viewTime || 0;
+        return timeB - timeA;
+      });
+
+      wx.setStorageSync('footprints', uniqueItems);
+      // 重新触发本地计算
+      this.calculateLocalStats();
+    } catch (e) {
+      console.error('Failed to sync and merge footprints', e);
+    }
+  },
+  
+
+  async silentLogin() {
+    try {
+      const loginRes = await API.login();
+      if (loginRes && loginRes.openid) {
+        wx.setStorageSync('user_openid', loginRes.openid);
+        console.log('静默建档成功, OpenID:', loginRes.openid);
+      }
+    } catch (err) {
+      console.error('静默登录建档失败', err);
     }
   },
 
-  onAuthCancel() {
-    this.setData({ showAuthModal: false });
-    wx.switchTab({ url: '/pages/index/index' });
+  goToHistory() {
+    wx.navigateTo({ url: '/pages/history/history' });
   },
 
-  onAuthSuccess(e) {
-    const { avatarUrl, nickName } = e.detail;
-    this.setData({
-      'userInfo.avatarUrl': avatarUrl,
-      'userInfo.nickName': nickName,
-      showAuthModal: false
-    });
-    // 用户资料更新完成，再次请求统计与主界面绘制
-    this.fetchUserStats();
+  goToDiscover() {
+    wx.switchTab({ url: '/pages/discover/discover' });
   },
 
   onShareAppMessage() {
-    return this.data.shareConfig;
+    return {
+      title: '小栗鼠查券神器，购物省钱必备',
+      path: '/pages/index/index',
+      imageUrl: '/images/invite_bg.png' 
+    };
+  },
+
+  onMenuTap(e) {
+    const id = e.currentTarget.dataset.id;
+    const routes = {
+      tutorial: '/pages/guide/guide',
+      faq: '/pages/faq/faq',
+      contact: '/pages/contact/contact',
+      community: '/pages/join-group/join-group',
+      favorite: '/pages/favorite/favorite'
+    };
+    
+    const url = routes[id];
+    if (url) {
+      wx.navigateTo({ url });
+    }
   }
 });

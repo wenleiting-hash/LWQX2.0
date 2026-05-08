@@ -1,0 +1,28 @@
+{
+    "status": 200,         /*状态，200表示成功，301表示失败*/
+    "content": "%e5%8d%b3%e5%8f%af%e9%a2%86%e5%88%b8%e8%b4%ad%e7%89%a9%e4%b8%8b%e5%8d%95+(lP5KcEYGJo9)",   /*自己的文案*/
+    "tao_id": "614876391300",         /*文案中最后一个商品的ID*/
+    "plat": "1",         /*1：淘宝，2：京东，3：拼多多，4：苏宁，5：唯品会，6：美团*/
+    "plat2": "1",         /*该字段仅对plat=1有效，1：淘宝，2：天猫，3：天猫超市*/
+    "is_youquan": "1",         /*是否有优惠券*/
+    "pic": "https://img.alicdn.com/bao/uploaded/i3/O1CN01g9wxcL1ygVrNE7HTc_!!0-item_pic.jpg",        /*文案中最后一个商品的商品主图*/
+    "cid1": "50012100",         /*一级分类ID*/
+    "cid1_name": "生活电器",         /*一级分类名称*/
+    "cid2": "50008557",         /*二级分类ID*/
+    "cid2_name": "电风扇",         /*二级分类名称*/
+    "cid3": "",         /*三级分类ID*/
+    "cid3_name": "",         /*三级分类名称*/
+    "volume": "40000",         /*总销量*/
+    "commentCount": "13333",         /*评论数量*/
+    "title": "家用电风扇钻石牌遥控落地扇",         /*商品短标题*/
+    "tao_title": "钻石牌家用电风扇落地式风扇宿舍台式遥控办公室静音大风力摇头扇",         /*商品长标题*/
+    "size": "69",         /*原始价格*/
+    "quanhou_jiage": "49.1",         /*券后价格*/
+    "tkrate3": "15.01",         /*佣金比例*/
+    "tkfee3": "7.37",         /*佣金金额*/
+    "coupon_info_money": "13",         /*优惠券金额*/
+    "nick": "钻石牌桦键炜专卖店",         /*店铺昵称*/
+    "result_tkl": (Y1vH2lT9emg),         /*生成的推广淘口令*/
+    "result_url": https://uland.taobao.com/coupon/edetail?e=MHOV6g5nQUWlhHvvyUNXZfh8CuWt5YH5OVuOuRD5gLJMm99_2709@01,        /*生成的推广链接*/
+    "chunwenzi": "0"         /*文案是否纯文字，0否 1是*/
+}

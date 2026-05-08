@@ -1,28 +1,120 @@
-<scroll-view scroll-y class="page" enhanced show-scrollbar="{{false}}">
-  <view class="content-area">
-    <!-- Hero Card -->
-    <view class="hero-card">
-      <image class="hero-img" src="{{heroImagePath}}" mode="aspectFill"></image>
-      <view class="hero-overlay">
-        <view class="hero-text-box">
-          <text class="hero-title">欢迎来到老温的交流大群</text>
-          <text class="hero-sub">与众多行业大佬聊AI</text>
-        </view>
-      </view>
-    </view>
-    
-    <!-- QR Card -->
-    <view class="qr-card">
-      <text class="qr-tip">扫码添加老温微信</text>
-      <view class="qr-container">
-        <image class="qr-code" src="{{qrImagePath}}" mode="aspectFit"></image>
-      </view>
-      <view class="wechat-row">
-        <text class="wechat-info">微信号: {{wechatId}}</text>
-        <view class="mini-copy-btn" bindtap="onCopyWechat">
-          <text class="copy-text">复制</text>
-        </view>
-      </view>
+<view class="community-container pb-safe">
+  
+  <!-- Header with Barrage (弹幕) -->
+  <view class="header-section">
+    <!-- Real-time Barrage Ticker -->
+    <view class="barrage-container">
+      <view class="icon-speaker"></view>
+      <swiper class="barrage-swiper" vertical autoplay circular interval="3000">
+        <swiper-item wx:for="{{barrage}}" wx:key="*this" class="barrage-item">
+          <text class="barrage-text line-clamp-1">{{item}}</text>
+        </swiper-item>
+      </swiper>
     </view>
   </view>
-</scroll-view>
+
+  <view class="main-content-wrapper">
+    <!-- Stats Card -->
+    <view class="stats-card">
+      <view class="stat-item">
+        <view class="stat-label">今日累计省钱</view>
+        <view class="stat-value highlight-value">
+          <text class="stat-symbol">¥</text>{{dailyStats.amount}}
+        </view>
+      </view>
+      <view class="stat-divider"></view>
+      <view class="stat-item">
+        <view class="stat-label">今日领券笔数</view>
+        <view class="stat-value">
+          {{dailyStats.count}}<text class="stat-unit">单</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- Section Title -->
+    <view class="section-header" style="justify-content: space-between;">
+      <view style="display: flex; align-items: center; gap: 12rpx;">
+        <view class="section-indicator"></view>
+        <view class="section-title">热门订单播报 <text wx:if="{{newCount > 0}}" style="color:#EF4444; font-size: 24rpx; font-weight: normal; margin-left: 12rpx;">近期新增 {{newCount}} 单</text></view>
+      </view>
+    </view>
+
+    <!-- Orders Feed -->
+    <view class="order-list">
+      <!-- Data Items -->
+      <block wx:if="{{!isLoading}}">
+        <view class="order-item" wx:for="{{orders}}" wx:key="id" bindtap="goToDetail" data-taoid="{{item.tao_id}}" data-platform="{{item.platform}}">
+          <!-- 头部用户信息 -->
+          <view class="order-header-row">
+            <view class="user-avatar" style="background: linear-gradient(135deg, {{item.avatarColor}}, {{item.avatarColor}}dd);">
+              {{item.avatarInitial}}
+            </view>
+            <view class="user-info">
+              <view class="user-name-row">
+                <text class="user-name">{{item.user}}</text>
+                <text class="user-platform {{item.platform === 'jd' ? 'jd' : 'tb'}}">{{item.platform === 'jd' ? '京东' : '淘宝'}}</text>
+              </view>
+              <text class="user-time">{{item.time}}</text>
+            </view>
+          </view>
+
+          <!-- 商品微缩卡片区 -->
+          <view class="product-share-card">
+            <image class="product-img" src="{{item.imageUrl || 'https://via.placeholder.com/140?text=暂无图片'}}" mode="aspectFill" lazy-load="{{true}}"></image>
+            <view class="product-info">
+              <view class="product-title line-clamp-2">{{item.itemTitle}}</view>
+              <view class="product-price-row">
+                <text class="price-label">券后</text>
+                <text class="price-symbol">¥</text>
+                <text class="price-value">{{item.couponPrice}}</text>
+                <text class="price-original" wx:if="{{item.originalPrice && item.originalPrice !== item.couponPrice}}">¥{{item.originalPrice}}</text>
+              </view>
+            </view>
+          </view>
+
+          <!-- 底部互动区 -->
+          <view class="order-action-row">
+            <view class="saved-amount-box">
+              <text class="saved-label">已省</text>
+              <text class="saved-value">¥{{item.save}}</text>
+            </view>
+            <view class="action-btn" hover-class="btn-hover">跟买领券</view>
+          </view>
+        </view>
+      </block>
+
+      <!-- Skeleton Items (Loading State) -->
+      <block wx:else>
+        <view class="order-item" wx:for="{{[1,2,3,4,5]}}" wx:key="*this">
+          <view class="order-header-row">
+            <view class="skeleton-block" style="width: 72rpx; height: 72rpx; border-radius: 50%;"></view>
+            <view class="user-info" style="flex: 1;">
+              <view class="skeleton-block" style="width: 120rpx; height: 28rpx; margin-bottom: 12rpx;"></view>
+              <view class="skeleton-block" style="width: 140rpx; height: 22rpx;"></view>
+            </view>
+          </view>
+          <view class="product-share-card">
+            <view class="skeleton-block" style="width: 140rpx; height: 140rpx; border-radius: 12rpx;"></view>
+            <view class="product-info" style="flex: 1;">
+              <view class="skeleton-block" style="width: 100%; height: 26rpx; margin-bottom: 12rpx;"></view>
+              <view class="skeleton-block" style="width: 80%; height: 26rpx; margin-bottom: 20rpx;"></view>
+              <view class="skeleton-block" style="width: 100rpx; height: 32rpx;"></view>
+            </view>
+          </view>
+          <view class="order-action-row">
+            <view class="skeleton-block" style="width: 120rpx; height: 36rpx; border-radius: 8rpx;"></view>
+            <view class="skeleton-block" style="width: 140rpx; height: 64rpx; border-radius: 32rpx;"></view>
+          </view>
+        </view>
+      </block>
+
+      <!-- Bottom Loading Indicator -->
+      <view class="loading-more" style="text-align: center; color: #9CA3AF; font-size: 26rpx; padding: 32rpx 0; font-weight: 500;">
+        <block wx:if="{{!isLoading}}">
+          {{hasMore ? '上拉加载更多' : '— 到底啦 —'}}
+        </block>
+      </view>
+    </view>
+
+  </view>
+</view>

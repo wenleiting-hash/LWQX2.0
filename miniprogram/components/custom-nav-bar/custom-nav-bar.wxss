@@ -1,0 +1,33 @@
+.custom-nav-bar {
+  position: relative;
+  width: 100%;
+  z-index: 999;
+  background-size: cover;
+  background-position: center;
+  flex-shrink: 0;
+}
+
+.nav-bar-content {
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.title {
+  /* Ensure the title text wraps cleanly if it's too long */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 返回箭头 */
+.back-arrow {
+  width: 20rpx;
+  height: 20rpx;
+  border-top: 3rpx solid currentColor;
+  border-left: 3rpx solid currentColor;
+  transform: rotate(-45deg);
+}
+.border-white { border-color: #ffffff; }
+.border-black { border-color: #000000; }
+

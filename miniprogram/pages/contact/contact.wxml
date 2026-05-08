@@ -1,0 +1,49 @@
+<view class="container pb-safe">
+  <view class="hero-section">
+    <view class="hero-icon-box">
+      <view class="hero-icon">🎧</view>
+    </view>
+    <view class="hero-title">专属一对一客服</view>
+    <view class="hero-subtitle">竭诚为您解答各种疑问，贴心服务</view>
+  </view>
+  
+  <view class="content-box">
+    
+    <view class="qr-card" wx:if="{{config.service_qrcode_url}}">
+      <view class="card-header">
+        <view class="header-line"></view>
+        <text class="header-title">长按扫码 · 添加微信</text>
+        <view class="header-line"></view>
+      </view>
+      <view class="qr-wrapper">
+        <view class="qr-border">
+          <image class="qr-img" src="{{config.service_qrcode_url}}" mode="aspectFit" show-menu-by-longpress="true"></image>
+        </view>
+      </view>
+    </view>
+
+    <view class="action-list">
+      <view class="contact-item" bindtap="copyWechat" hover-class="item-hover" wx:if="{{config.wechatId}}">
+        <view class="item-icon-wrap wechat-wrap">
+          <view class="icon-emoji">💬</view>
+        </view>
+        <view class="item-info">
+          <view class="item-title">客服微信</view>
+          <view class="item-desc font-num">{{config.wechatId}}</view>
+        </view>
+        <view class="item-btn wechat-btn">复制</view>
+      </view>
+
+      <view class="contact-item" bindtap="makePhoneCall" hover-class="item-hover" wx:if="{{config.phone}}">
+        <view class="item-icon-wrap phone-wrap">
+          <view class="icon-emoji">📞</view>
+        </view>
+        <view class="item-info">
+          <view class="item-title">客服热线</view>
+          <view class="item-desc font-num">{{config.phone}}</view>
+        </view>
+        <view class="item-btn phone-btn">拨打</view>
+      </view>
+    </view>
+  </view>
+</view>

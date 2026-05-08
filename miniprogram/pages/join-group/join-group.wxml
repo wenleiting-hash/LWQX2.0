@@ -1,0 +1,70 @@
+<view class="container pb-safe">
+  <view class="hero-section">
+    <view class="hero-icon-box">
+      <image class="hero-logo" src="/images/logo.png" mode="aspectFill"></image>
+    </view>
+    <view class="hero-title">官方福利社群</view>
+    <view class="hero-subtitle">内部神券、免单福利、每日准时发放</view>
+  </view>
+  
+  <view class="content-box">
+    
+    <block wx:if="{{activeCommunityQrCode}}">
+      <view class="qr-card">
+        <view class="status-badge {{isExpired ? 'expired' : 'active'}}">
+          <view class="status-dot"></view>
+          <text>{{isExpired ? '已过期' : '招募中'}}</text>
+        </view>
+        
+        <view class="qr-wrapper">
+          <view class="qr-border">
+            <image class="qr-img {{isExpired ? 'img-expired' : ''}}" src="{{activeCommunityQrCode.qrCodeUrl}}" mode="aspectFit" show-menu-by-longpress="{{!isExpired}}"></image>
+            <view class="expired-overlay" wx:if="{{isExpired}}">
+              <text class="overlay-icon">⚠️</text>
+              <text class="overlay-text">二维码已失效</text>
+            </view>
+          </view>
+        </view>
+        
+        <block wx:if="{{!isExpired}}">
+          <view class="qr-tips">
+            <text class="tips-icon">📸</text>
+            <text>长按识别二维码或保存图片</text>
+          </view>
+          <view class="expire-text mt-4">
+            <text class="expire-icon">⏳</text>
+            <text>该二维码将在 <text class="font-num highlight-time">{{activeCommunityQrCode.expirationDate}}</text> 失效</text>
+          </view>
+        </block>
+        <block wx:else>
+          <view class="expire-text text-red">
+            <text class="expire-icon">⏰</text>
+            <text>哎呀，你来晚了，该二维码已于 <text class="font-num">{{activeCommunityQrCode.expirationDate}}</text> 失效</text>
+          </view>
+        </block>
+      </view>
+      
+      <button class="contact-item btn-reset mt-4" open-type="contact" hover-class="item-hover" wx:if="{{isExpired}}">
+        <view class="item-icon-wrap wechat-wrap">
+          <view class="icon-emoji">💬</view>
+        </view>
+        <view class="item-info">
+          <view class="item-title">联系客服获取新群码</view>
+          <view class="item-desc">群满了或者码过期了？点我获取</view>
+        </view>
+        <view class="item-arrow">></view>
+      </button>
+    </block>
+
+    <block wx:else>
+      <view class="empty-state">
+        <view class="empty-bg">
+          <view class="empty-icon">👥</view>
+        </view>
+        <view class="empty-title">暂无社群活动</view>
+        <view class="empty-text">社群通道暂未开放，敬请期待！</view>
+      </view>
+    </block>
+
+  </view>
+</view>

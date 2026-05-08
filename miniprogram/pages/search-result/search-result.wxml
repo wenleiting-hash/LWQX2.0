@@ -1,0 +1,138 @@
+<view class="container pb-safe">
+  <!-- 顶部搜索与筛选区 -->
+  <view class="header-section sticky-top">
+    <!-- 搜索框 -->
+    <view class="search-box">
+      <view class="search-input-wrapper">
+        <view class="icon-search"></view>
+        <input class="search-input" value="{{keyword}}" placeholder="粘贴商品标题或链接，自动查隐藏券" bindconfirm="onSearchConfirm" bindinput="onSearchInput" />
+        <view class="icon-clear" wx:if="{{keyword.length > 0}}" bindtap="onClear"></view>
+      </view>
+      <view class="search-btn" bindtap="onSearchBtnClick">搜索</view>
+    </view>
+
+    <!-- 排序筛选栏 -->
+    <view class="sort-bar">
+      <view class="sort-item {{sortType === 'default' ? 'active' : ''}}" bindtap="changeSort" data-type="default">综合</view>
+      <view class="sort-item {{sortType === 'sales' ? 'active' : ''}}" bindtap="changeSort" data-type="sales">销量</view>
+      <view class="sort-item price-sort {{sortType === 'price' ? 'active' : ''}}" bindtap="changeSort" data-type="price">
+        <text>价格</text>
+        <view class="sort-arrows">
+          <view class="arrow-up {{sortType === 'price' && sortOrder === 'asc' ? 'active-arrow' : ''}}"></view>
+          <view class="arrow-down {{sortType === 'price' && sortOrder === 'desc' ? 'active-arrow' : ''}}"></view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 列表区域 -->
+  <scroll-view class="list-container" scroll-y="{{true}}" bindscrolltolower="loadMore" lower-threshold="200">
+    
+    <!-- 加载中 -->
+    <block wx:if="{{loading && page === 1}}">
+      <view class="waterfall-grid">
+        <view class="product-card" wx:for="{{[1,2,3,4]}}" wx:key="*this">
+          <view class="skeleton-block" style="height: 340rpx; border-radius: 0;"></view>
+          <view class="product-info" style="padding-top: 24rpx;">
+            <view class="skeleton-block" style="width: 100%; height: 28rpx; margin-bottom: 12rpx;"></view>
+            <view class="skeleton-block" style="width: 70%; height: 28rpx; margin-bottom: 24rpx;"></view>
+          </view>
+        </view>
+      </view>
+    </block>
+
+    <block wx:else>
+      <!-- 有数据：展示搜索结果 -->
+      <block wx:if="{{productList.length > 0}}">
+        <view class="waterfall-grid">
+          <view class="product-card" wx:for="{{productList}}" wx:key="tao_id" bindtap="goToDetail" data-item="{{item}}">
+            <view class="image-wrapper">
+              <image src="{{item.image_url || item.image}}" mode="widthFix" class="product-image" lazy-load="true" />
+              <view class="platform-tag">
+                {{(item.platform === 'tb' || item.platform === 'taobao') ? '淘宝' : '京东'}}
+              </view>
+            </view>
+            <view class="product-info">
+              <view class="product-title line-clamp-2">{{item.title}}</view>
+              
+              <view class="price-section">
+                <view class="coupon-tag" wx:if="{{item.coupon_amount || item.coupon}}">
+                  <text class="coupon-txt">券</text>
+                  <text class="coupon-val">¥{{item.coupon_amount || item.coupon}}</text>
+                </view>
+                
+                <view class="price-row">
+                  <view class="final-price">
+                    <text class="price-symbol">¥</text>
+                    <text class="price-num">{{item.coupon_price || item.price}}</text>
+                  </view>
+                  <text class="original-price" wx:if="{{item.original_price}}">¥{{item.original_price}}</text>
+                </view>
+                
+                <view class="sales-row">
+                  <text class="sales-text">已售 {{item.sales_num || item.sales || 0}}</text>
+                  <view class="buy-btn">领券抢购</view>
+                </view>
+              </view>
+            </view>
+          </view>
+        </view>
+        
+        <!-- 底部加载状态 -->
+        <view class="loading-status">
+          <text wx:if="{{loading}}">正在加载...</text>
+          <text wx:elif="{{noMoreData}}">没有更多结果了</text>
+        </view>
+      </block>
+      
+      <!-- 无数据：空状态 + 为您推荐 -->
+      <block wx:else>
+        <!-- 空状态提示 -->
+        <view class="empty-state">
+          <image class="empty-image" src="/images/empty_search.png" mode="aspectFit"></image>
+          <view class="empty-title">暂未找到相关优惠</view>
+          <view class="empty-desc">换个词搜搜看，或浏览下方为您推荐的热卖好物</view>
+        </view>
+
+        <!-- 为您推荐标题 -->
+        <view class="recommend-header">
+          <view class="line"></view>
+          <text class="recommend-title">为您推荐</text>
+          <view class="line"></view>
+        </view>
+
+        <!-- 推荐列表 (复用样式) -->
+        <view class="waterfall-grid">
+          <view class="product-card" wx:for="{{recommendList}}" wx:key="tao_id" bindtap="goToDetail" data-item="{{item}}">
+            <view class="image-wrapper">
+              <image src="{{item.image_url || item.image}}" mode="widthFix" class="product-image" lazy-load="true" />
+              <view class="platform-tag">
+                {{(item.platform === 'tb' || item.platform === 'taobao') ? '淘宝' : '京东'}}
+              </view>
+            </view>
+            <view class="product-info">
+              <view class="product-title line-clamp-2">{{item.title}}</view>
+              <view class="price-section">
+                <view class="coupon-tag" wx:if="{{item.coupon_amount || item.coupon}}">
+                  <text class="coupon-txt">券</text>
+                  <text class="coupon-val">¥{{item.coupon_amount || item.coupon}}</text>
+                </view>
+                <view class="price-row">
+                  <view class="final-price">
+                    <text class="price-symbol">¥</text>
+                    <text class="price-num">{{item.coupon_price || item.price}}</text>
+                  </view>
+                </view>
+                <view class="sales-row">
+                  <text class="sales-text">已售 {{item.sales_num || item.sales || 0}}</text>
+                  <view class="buy-btn">领券抢购</view>
+                </view>
+              </view>
+            </view>
+          </view>
+        </view>
+      </block>
+    </block>
+
+  </scroll-view>
+</view>

@@ -1,0 +1,171 @@
+<view class="container pb-safe">
+  <!-- 自定义导航栏 -->
+  <view class="custom-navbar" style="background-color: rgba(255, 255, 255, {{navAlpha}}); padding-top: {{statusBarHeight}}px;">
+    <view class="navbar-content" style="height: {{navContentHeight}}px;">
+      <view class="back-btn" bindtap="goBack">
+        <image class="back-icon" src="/images/tabbar/back{{navAlpha > 0.5 ? '_black' : '_white'}}.png"></image>
+      </view>
+      <text class="navbar-title" style="opacity: {{navAlpha}};">商品详情</text>
+    </view>
+  </view>
+
+  <block wx:if="{{loading}}">
+    <!-- 详情页骨架屏 -->
+    <loading-skeleton type="detail" />
+  </block>
+
+  <block wx:elif="{{itemData}}">
+    <!-- 1. 顶部轮播图 -->
+    <swiper class="detail-swiper" indicator-dots="{{true}}" circular="{{true}}" indicator-active-color="#FF6200">
+      <block wx:if="{{(itemData.small_images && itemData.small_images.length > 0) || (itemData.images && itemData.images.length > 0)}}">
+        <swiper-item wx:for="{{itemData.small_images || itemData.images}}" wx:key="*this">
+          <image src="{{item}}" mode="aspectFill" class="swiper-image"></image>
+        </swiper-item>
+      </block>
+      <block wx:else>
+        <swiper-item>
+          <image src="{{itemData.image_url || itemData.image}}" mode="aspectFill" class="swiper-image"></image>
+        </swiper-item>
+      </block>
+    </swiper>
+
+    <!-- 2. 核心信息区 -->
+    <view class="info-card">
+      <view class="price-row">
+        <view class="price-left">
+          <text class="price-label">券后价 ¥</text>
+          <text class="price-current">{{itemData.coupon_price || itemData.price}}</text>
+          <text class="price-original" wx:if="{{itemData.original_price > (itemData.coupon_price || itemData.price)}}">原价 ¥{{itemData.original_price}}</text>
+        </view>
+        <view class="sales-info">已售 {{itemData.sales_num || itemData.sales || 0}}</view>
+      </view>
+
+      <!-- 优惠券模块 -->
+      <view class="coupon-box" wx:if="{{itemData.coupon_amount || itemData.coupon}}">
+        <view class="coupon-circle-left"></view>
+        <view class="coupon-circle-right"></view>
+        
+        <view class="coupon-left">
+          <view class="coupon-title">¥{{itemData.coupon_amount || itemData.coupon}} 专属隐藏券</view>
+          <view class="coupon-time" wx:if="{{itemData.coupon_end_time}}">有效期至 {{itemData.coupon_end_time}}</view>
+        </view>
+        <view class="coupon-right">马上抢 ></view>
+      </view>
+
+      <!-- 标题区 -->
+      <view class="title-row">
+        <view class="platform-badge">
+          {{(itemData.platform === 'tb' || itemData.platform === 'taobao') ? '淘宝' : '京东'}}
+        </view>
+        <text class="product-title">{{itemData.title}}</text>
+      </view>
+      
+      <!-- 店铺 -->
+      <view class="shop-row" wx:if="{{itemData.shop_name}}">
+        <text class="shop-name">{{itemData.shop_name}}</text>
+      </view>
+    </view>
+
+    <!-- 3. 商品详情图 -->
+    <view class="desc-card" wx:if="{{(itemData.small_images && itemData.small_images.length > 0) || (itemData.images && itemData.images.length > 0)}}">
+      <view class="desc-title">商品详情</view>
+      <view class="desc-images">
+        <image 
+          wx:for="{{itemData.small_images || itemData.images}}" 
+          wx:key="*this" 
+          src="{{item}}" 
+          mode="widthFix" 
+          class="desc-image" 
+          lazy-load="{{true}}"
+          show-menu-by-longpress="{{true}}"
+        ></image>
+      </view>
+    </view>
+    <view class="desc-card" wx:else>
+      <text class="desc-hint">暂无更多商品图片</text>
+    </view>
+  </block>
+
+  <block wx:else>
+    <!-- 加载失败或无数据 -->
+    <view class="error-state">
+      <view class="error-icon">⚠️</view>
+      <view class="error-text">商品信息获取失败</view>
+      <button class="retry-btn" bindtap="retry">重试</button>
+    </view>
+  </block>
+
+  <!-- 4. 底部 CTA 操作栏 -->
+  <view class="bottom-cta" wx:if="{{itemData}}">
+    <view class="action-group">
+      <view class="action-btn" bindtap="goHome">
+        <image src="/images/tabbar/home.png" class="action-icon"></image>
+        <text class="action-text">首页</text>
+      </view>
+      <view class="action-btn" bindtap="toggleFavorite">
+        <view class="action-icon icon-lucide {{isFavorite ? 'icon-star-filled' : 'icon-star'}}"></view>
+        <text class="action-text">{{isFavorite ? '收藏' : '收藏'}}</text>
+      </view>
+      <button class="action-btn action-btn-share" open-type="share">
+        <image src="/images/tabbar/discover.png" class="action-icon"></image>
+        <text class="action-text">分享</text>
+      </button>
+    </view>
+
+    <!-- 购买按钮 -->
+    <view class="buy-wrapper">
+      <button class="buy-main-btn" bindtap="handleConvertAndBuy">
+        <text>领券购买</text>
+        <text class="buy-subtext" wx:if="{{itemData.coupon_amount || itemData.coupon}}">(省¥{{itemData.coupon_amount || itemData.coupon}})</text>
+      </button>
+    </view>
+  </view>
+
+  <!-- 查券结果弹窗 Modal -->
+  <view class="modal-overlay" wx:if="{{showResultModal}}">
+    <view class="modal-content result-modal">
+      <!-- 右上角关闭 X -->
+      <view class="modal-close-btn" bindtap="closeResultModal">
+        <text class="modal-close-icon">×</text>
+      </view>
+
+      <block wx:if="{{!showCopyGuide}}">
+        <!-- 商品信息区 -->
+        <view class="result-goods-info">
+          <image class="result-goods-img" src="{{itemData.image_url || itemData.image || itemData.pict_url}}" mode="aspectFill"></image>
+          <view class="result-goods-title line-clamp-2">{{itemData.title}}</view>
+        </view>
+
+        <!-- 提示语区域 -->
+        <view class="result-compliance-msg">
+          <block wx:if="{{itemData.coupon_amount || itemData.coupon}}">
+            <text>恭喜，该商品查到专属隐藏优惠券，您可复制后返回原APP下单。</text>
+          </block>
+          <block wx:else>
+            <text>很遗憾，该商品暂无更多优惠，您可复制后返回原APP下单。</text>
+          </block>
+        </view>
+
+        <!-- 按钮区域 -->
+        <view class="modal-btn-wrap w-full flex flex-col gap-2" style="width: 100%; display: flex; flex-direction: column; gap: 8px; margin-top: 16px;">
+          <view class="modal-btn confirm-btn" bindtap="{{(itemData.platform === 'jd' || itemData.platform === 'jingdong') ? 'copyAndOpenJd' : 'copyAndOpenTaobao'}}">
+            复制返回原APP下单
+          </view>
+          <view class="modal-btn ignore-btn" bindtap="closeResultModal">取消</view>
+        </view>
+      </block>
+
+      <!-- 复制成功后的引导页 -->
+      <block wx:else>
+        <view class="copy-guide-wrap flex flex-col items-center gap-4 py-6 w-full" style="display: flex; flex-direction: column; align-items: center; width: 100%; padding: 24px 0;">
+          <icon type="success" size="64" color="#07C160"></icon>
+          <view class="font-bold text-lg mt-2" style="font-weight: bold; font-size: 18px; margin-top: 8px;">复制成功！</view>
+          <view class="text-gray-500 text-center leading-relaxed" style="color: #666; text-align: center; line-height: 1.6; margin-top: 16px;">
+            <text>优惠链接/口令已保存至剪贴板\n请直接打开 <text class="font-bold text-orange-500" style="font-weight: bold; color: #FF6200;">{{(itemData.platform === 'jd' || itemData.platform === 'jingdong') ? '京东' : '手机淘宝'}}</text> App\n等待几秒即可自动弹出口令</text>
+          </view>
+          <view class="modal-btn confirm-btn w-full mt-6" bindtap="closeResultModal" style="width: 100%; margin-top: 24px;">我知道了</view>
+        </view>
+      </block>
+    </view>
+  </view>
+</view>

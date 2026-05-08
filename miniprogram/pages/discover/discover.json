@@ -1,6 +1,8 @@
 {
   "navigationBarTitleText": "发现好物",
-  "navigationStyle": "custom",
-  "navigationBarBackgroundColor": "#FFFFFF",
-  "navigationBarTextStyle": "black"
+  "navigationBarBackgroundColor": "#FEF8F4",
+  "navigationBarTextStyle": "black",
+  "usingComponents": {
+    "search-bar": "/components/search-bar/search-bar"
+  }
 }

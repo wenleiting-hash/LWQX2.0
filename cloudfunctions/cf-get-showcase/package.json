@@ -1,0 +1,12 @@
+{
+  "name": "cf-get-showcase",
+  "version": "1.0.0",
+  "description": "获取晒单缓存数据",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

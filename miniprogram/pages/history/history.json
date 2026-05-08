@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "查券足迹",
+  "navigationBarBackgroundColor": "#FFFFFF",
+  "backgroundColor": "#F5F5F5",
+  "usingComponents": {
+    "product-card": "/components/product-card/product-card"
+  }
+}

@@ -1,28 +1,84 @@
-<scroll-view scroll-y class="page" enhanced show-scrollbar="{{false}}">
-  <view class="content-area">
-    <!-- Loading State -->
-    <view wx:if="{{loading}}" style="text-align: center; padding-top: 100rpx;">
-      <text style="color: #999; font-size: 24rpx;">加载中...</text>
-    </view>
-
-    <!-- Content -->
-    <block wx:elif="{{categories.length > 0}}">
-      <view class="card" wx:for="{{categories}}" wx:key="title">
-        <text class="card-title">{{item.title}}</text>
-        <view class="qa-item" wx:for="{{item.items}}" wx:for-item="qa" wx:key="q">
-          <text class="q-text">Q：{{qa.q}}</text>
-          <text class="a-text">A：{{qa.a}}</text>
-        </view>
+<view class="container pb-safe">
+  <scroll-view class="scroll-content" scroll-y="{{true}}">
+    <block wx:if="{{tutorial_content}}">
+      <view style="padding: 20px;">
+        <rich-text nodes="{{tutorial_content}}"></rich-text>
       </view>
     </block>
+    <block wx:else>
+      <!-- 页面标题 -->
+      <view class="page-header">
+        <view class="header-title">如何使用小栗鼠查券省钱？</view>
+        <view class="header-desc">只需3步，轻松领取隐藏优惠券</view>
+      </view>
 
-    <!-- Empty State -->
-    <view wx:else style="text-align: center; padding-top: 100rpx;">
-      <text style="color: #999; font-size: 24rpx;">暂无说明文档</text>
-    </view>
-    
-    <view class="contact-section">
-      <text class="contact-text">如有其他疑问，请随时咨询专属客服。</text>
-    </view>
+      <!-- 步骤卡片 -->
+      <view class="step-card">
+        <view class="step-header">
+          <view class="step-num">1</view>
+          <text class="step-title">在淘宝/京东复制链接</text>
+        </view>
+        <view class="step-body">
+          <text class="step-desc">在你想买的商品详情页，点击右上角分享按钮，选择【复制链接】或【复制口令】。</text>
+          <view class="step-image-placeholder">
+            <view class="placeholder-icon">📋</view>
+            <text class="placeholder-text">复制商品链接示意</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="step-connector">
+        <view class="connector-line"></view>
+        <view class="connector-arrow">↓</view>
+        <view class="connector-line"></view>
+      </view>
+
+      <view class="step-card">
+        <view class="step-header">
+          <view class="step-num">2</view>
+          <text class="step-title">打开小栗鼠小程序</text>
+        </view>
+        <view class="step-body">
+          <text class="step-desc">返回微信，下拉聊天列表打开"小栗鼠查券"。小程序会自动识别您刚刚复制的商品链接。</text>
+          <view class="step-image-placeholder">
+            <view class="placeholder-icon">🐿️</view>
+            <text class="placeholder-text">自动识别链接示意</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="step-connector">
+        <view class="connector-line"></view>
+        <view class="connector-arrow">↓</view>
+        <view class="connector-line"></view>
+      </view>
+
+      <view class="step-card">
+        <view class="step-header">
+          <view class="step-num">3</view>
+          <text class="step-title">领券下单，省钱成功</text>
+        </view>
+        <view class="step-body">
+          <text class="step-desc">点击弹出的商品卡片进入详情，点击底部【领券购买】，即可使用专属隐藏优惠券，立省大笔钱！</text>
+          <view class="step-image-placeholder">
+            <view class="placeholder-icon">🎉</view>
+            <text class="placeholder-text">领券购买示意</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 温馨提示 -->
+      <view class="tips-card">
+        <view class="tips-title">💡 温馨提示</view>
+        <view class="tips-item">• 优惠券数量有限，建议看到心动商品立即领取</view>
+        <view class="tips-item">• 领券后请在有效期内完成购买</view>
+        <view class="tips-item">• 本工具完全免费，无需充值无需会员</view>
+      </view>
+    </block>
+  </scroll-view>
+
+  <!-- 底部悬浮按钮 -->
+  <view class="bottom-cta">
+    <view class="cta-btn" bindtap="goHome" hover-class="cta-btn-hover">去查券试试</view>
   </view>
-</scroll-view>
+</view>

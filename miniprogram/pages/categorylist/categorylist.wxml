@@ -1,69 +1,117 @@
-<view class="page">
-  <!-- 搜索栏 -->
-  <view class="search-wrap">
-    <view class="search-bar">
-      <icon class="search-icon" type="search" size="14" color="#999"></icon>
-      <input class="search-input" placeholder="在当前分类下搜索关键字" value="{{searchKeyword}}" bindinput="onSearchInput" bindconfirm="onSearchConfirm" confirm-type="search"/>
-      <icon class="clear-icon" type="clear" size="14" color="#999" wx:if="{{searchKeyword}}" bindtap="onClearSearch"></icon>
-      <view class="search-btn" bindtap="onSearchConfirm">查券</view>
+<view class="container pb-safe">
+  <!-- 顶部搜索区 -->
+  <view class="header-section">
+    <view class="search-box">
+      <!-- 平台切换 (合并入搜索行) -->
+      <view class="platform-segment" wx:if="{{hasPlatformTab}}">
+        <view class="seg-item {{currentPlatform === 'tb' ? 'active' : ''}}" bindtap="switchPlatform" data-p="tb">淘宝</view>
+        <view class="seg-item {{currentPlatform === 'jd' ? 'active' : ''}}" bindtap="switchPlatform" data-p="jd">京东</view>
+      </view>
+
+      <view class="search-input-wrapper">
+        <view class="icon-search"></view>
+        <input class="search-input" value="{{searchKeyword}}" placeholder="在{{categoryName}}下搜索" bindconfirm="onSearchConfirm" bindinput="onSearchInput" confirm-type="search" />
+        <view class="icon-clear" wx:if="{{searchKeyword.length > 0}}" bindtap="onClearSearch"></view>
+      </view>
+      <view class="search-btn" bindtap="onSearchConfirm">搜索</view>
     </view>
-  </view>
 
-  <view class="filter-bar">
-    <view class="filter-item active">综合排序</view>
-    <view class="filter-item">销量优先</view>
-    <view class="filter-item">价格</view>
-  </view>
-
-  <scroll-view scroll-y class="goods-scroll" bindscrolltolower="onReachBottom">
-    <view class="waterfall">
-      <!-- 左列 -->
-      <view class="column">
-        <view
-          class="goods-card"
-          wx:for="{{leftList}}"
-          wx:key="id"
-          bindtap="onGoodsClick"
-          data-id="{{item.id}}"
-        >
-          <view class="goods-img-wrap">
-            <image class="goods-img" src="{{item.image}}" mode="widthFix"></image>
-            <view class="play-overlay" wx:if="{{item.video}}"><text class="play-icon">Play</text></view>
-            <view class="discount-badge" wx:if="{{item.badge}}">{{item.badge}}</view>
+    <!-- 排序筛选栏 -->
+    <view class="sort-bar">
+      <!-- 左侧：排序项 -->
+      <view class="sort-left">
+        <view class="sort-item {{sortType === 'default' ? 'active' : ''}}" bindtap="changeSort" data-type="default">综合</view>
+        <view class="sort-item price-sort {{sortType === 'sales' ? 'active' : ''}}" bindtap="changeSort" data-type="sales">
+          <text>销量</text>
+          <view class="sort-arrows">
+            <view class="arrow-up {{sortType === 'sales' && sortOrder === 'asc' ? 'active-arrow' : ''}}"></view>
+            <view class="arrow-down {{sortType === 'sales' && sortOrder === 'desc' ? 'active-arrow' : ''}}"></view>
           </view>
-          <view class="goods-info">
-            <view class="goods-title">{{item.title}}</view>
-            <view class="goods-footer">
-              <view class="goods-price">¥{{item.price}}</view>
-              <view class="goods-points">约得 {{item.points}} 积分</view>
-            </view>
+        </view>
+        <view class="sort-item price-sort {{sortType === 'price' ? 'active' : ''}}" bindtap="changeSort" data-type="price">
+          <text>价格</text>
+          <view class="sort-arrows">
+            <view class="arrow-up {{sortType === 'price' && sortOrder === 'asc' ? 'active-arrow' : ''}}"></view>
+            <view class="arrow-down {{sortType === 'price' && sortOrder === 'desc' ? 'active-arrow' : ''}}"></view>
           </view>
         </view>
       </view>
 
-      <!-- 右列 -->
-      <view class="column">
-        <view
-          class="goods-card"
-          wx:for="{{rightList}}"
-          wx:key="id"
-          bindtap="onGoodsClick"
-          data-id="{{item.id}}"
-        >
-          <view class="goods-img-wrap">
-            <image class="goods-img" src="{{item.image}}" mode="widthFix"></image>
-            <view class="play-overlay" wx:if="{{item.video}}"><text class="play-icon">Play</text></view>
-            <view class="discount-badge" wx:if="{{item.badge}}">{{item.badge}}</view>
-          </view>
-          <view class="goods-info">
-            <view class="goods-title">{{item.title}}</view>
-            <view class="goods-footer">
-              <view class="goods-price">¥{{item.price}}</view>
-              <view class="goods-points">约得 {{item.points}} 积分</view>
-            </view>
+      <!-- 右侧：特价专区价格标签 -->
+      <view class="price-tags-inline" wx:if="{{hasPriceTab}}">
+        <view class="filter-divider"></view>
+        <view 
+          class="price-tag-inline {{currentPrice === item.value ? 'active' : ''}}" 
+          wx:for="{{priceTabs}}" 
+          wx:key="value" 
+          bindtap="switchPriceTab" 
+          data-price="{{item.value}}"
+        >{{item.label}}</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 列表区域 -->
+  <scroll-view class="list-container" scroll-y="{{true}}" bindscrolltolower="loadMore" lower-threshold="200">
+    
+    <!-- 加载中骨架屏 -->
+    <block wx:if="{{isLoading && page === 1}}">
+      <view class="waterfall-grid">
+        <view class="product-card" wx:for="{{[1,2,3,4]}}" wx:key="*this">
+          <view class="skeleton-block" style="height: 340rpx;"></view>
+          <view class="product-info" style="padding-top: 24rpx;">
+            <view class="skeleton-block" style="width: 100%; height: 28rpx; margin-bottom: 12rpx;"></view>
+            <view class="skeleton-block" style="width: 70%; height: 28rpx;"></view>
           </view>
         </view>
       </view>
-    </view>
+    </block>
+
+    <block wx:else>
+      <!-- 有数据 -->
+      <block wx:if="{{productList.length > 0}}">
+        <view class="waterfall-grid">
+          <view class="product-card" wx:for="{{productList}}" wx:key="tao_id" bindtap="goToDetail" data-item="{{item}}">
+            <view class="image-wrapper">
+              <image src="{{item.image_url || item.image}}" mode="widthFix" class="product-image" lazy-load="true" />
+              <view class="platform-tag">{{item.platform === 'jd' ? '京东' : '淘宝'}}</view>
+            </view>
+            <view class="product-info">
+              <view class="product-title line-clamp-2">{{item.title}}</view>
+              <view class="price-section">
+                <view class="coupon-tag" wx:if="{{item.coupon_amount || item.coupon}}">
+                  <text class="coupon-txt">券</text>
+                  <text class="coupon-val">¥{{item.coupon_amount || item.coupon}}</text>
+                </view>
+                <view class="price-row">
+                  <view class="final-price">
+                    <text class="price-symbol">¥</text>
+                    <text class="price-num">{{item.coupon_price || item.price}}</text>
+                  </view>
+                  <text class="original-price" wx:if="{{item.original_price || item.originalPrice}}">¥{{item.original_price || item.originalPrice}}</text>
+                </view>
+                <view class="sales-row">
+                  <text class="sales-text" wx:if="{{item.sales_num || item.sales}}">已售 {{item.sales_num || item.sales}}</text>
+                  <view class="buy-btn">领券抢购</view>
+                </view>
+              </view>
+            </view>
+          </view>
+        </view>
+
+        <!-- 底部加载状态 -->
+        <view class="loading-status">
+          <text wx:if="{{isLoading}}">正在加载...</text>
+          <text wx:elif="{{noMoreData}}">没有更多结果了</text>
+        </view>
+      </block>
+
+      <!-- 空状态 -->
+      <view class="empty-state" wx:else>
+        <view class="empty-emoji">📦</view>
+        <view class="empty-title">暂无商品</view>
+        <view class="empty-desc">该分类下暂时没有优惠商品，换个分类看看</view>
+      </view>
+    </block>
   </scroll-view>
 </view>
