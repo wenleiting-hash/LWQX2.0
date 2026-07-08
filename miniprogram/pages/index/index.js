@@ -93,7 +93,7 @@ Page({
     const cleanText = (textToSearch || '').trim();
 
     if (!cleanText) {
-      wx.showToast({ title: '请输入商品链接或口令', icon: 'none' });
+      wx.showToast({ title: '请输入商品链接', icon: 'none' });
       return;
     }
 

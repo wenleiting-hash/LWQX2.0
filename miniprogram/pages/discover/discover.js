@@ -178,11 +178,15 @@ Page({
     this.setData({ searchKeyword: e.detail.value });
   },
 
+  onClear: function() {
+    this.setData({ searchKeyword: '' });
+  },
+
   doSearch: function() {
     const keyword = (this.data.searchKeyword || '').trim();
     if (!keyword) return;
     wx.navigateTo({
-      url: `/pages/search-result/search-result?keyword=${encodeURIComponent(keyword)}`
+      url: `/pages/search-result/search-result?keyword=${encodeURIComponent(keyword)}&platform=${this.data.searchPlatform === 'jd' ? 'jd' : 'tb'}`
     });
   },
 

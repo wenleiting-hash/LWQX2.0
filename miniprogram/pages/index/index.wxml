@@ -23,7 +23,7 @@
         <view class="textarea-wrapper">
           <textarea 
             class="search-textarea" 
-            placeholder="请长按粘贴淘宝/京东商品链接或口令" 
+            placeholder="请长按粘贴商品链接" 
             placeholder-class="placeholder-text"
             value="{{inputValue}}" 
             bindinput="onInput"
@@ -35,7 +35,7 @@
           </view>
         </view>
         <view class="search-btn-integrated" hover-class="btn-active" bindtap="onSearch">
-          <text class="search-btn-text">一键查券</text>
+          <text class="search-btn-text">查询</text>
         </view>
       </view>
 
@@ -57,7 +57,7 @@
         </view>
         <view class="flow-item">
           <view class="flow-icon-wrap"><text class="flow-num">3</text></view>
-          <text class="flow-text">一键查券省钱</text>
+          <text class="flow-text">查询</text>
         </view>
       </view>
       
@@ -92,7 +92,7 @@
       </view>
 
       <block wx:if="{{!showCopyGuide}}">
-        <!-- 商品信息区（有商品数据时才展示） -->
+        <!-- 产品信息区（有商品数据时才展示） -->
         <view class="result-goods-info" wx:if="{{resultModalData.title}}">
           <image class="result-goods-img" src="{{resultModalData.image_url}}" mode="aspectFill"></image>
           <view class="result-goods-title line-clamp-2">{{resultModalData.title}}</view>
@@ -102,11 +102,11 @@
         <view class="result-compliance-msg">
           <!-- 有券 -->
           <block wx:if="{{resultModalData.hasCoupon}}">
-            <text>恭喜，该商品查到更多优惠，您可复制后返回原APP下单。</text>
+            <text>恭喜，该商品查到更多优惠。</text>
           </block>
           <!-- 无券 -->
           <block wx:else>
-            <text>很遗憾，该商品暂无更多优惠，您可复制后返回原APP下单。</text>
+            <text>很遗憾，该商品暂无更多优惠。</text>
           </block>
         </view>
 
@@ -114,8 +114,8 @@
         <view class="modal-btn-wrap w-full flex flex-col gap-2">
           <view 
             class="modal-btn confirm-btn" 
-            bindtap="{{resultModalData.platform === 'jd' ? 'copyAndOpenJd' : 'copyAndOpenTaobao'}}">
-            复制返回原APP下单
+            bindtap="{{(resultModalData.platform === 'jd' || resultModalData.platform === 'jingdong') ? 'copyAndOpenJd' : 'copyAndOpenTaobao'}}">
+            复制产品信息
           </view>
           <view class="modal-btn ignore-btn" bindtap="closeResultModal">取消</view>
         </view>
@@ -127,7 +127,7 @@
           <icon type="success" size="64" color="#07C160"></icon>
           <view class="font-bold text-lg mt-2">复制成功！</view>
           <view class="text-gray-500 text-center leading-relaxed">
-            <text>优惠口令已保存至剪贴板\n请直接打开 <text class="font-bold text-orange-500">{{resultModalData.platform === 'jd' ? '京东' : '手机淘宝'}}</text> App\n等待几秒即可自动弹出口令</text>
+            <text>产品信息已复制\n请妥善保存使用</text>
           </view>
           <view class="modal-btn confirm-btn w-full mt-6" bindtap="closeResultModal">我知道了</view>
         </view>

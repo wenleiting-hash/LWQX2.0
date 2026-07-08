@@ -9,6 +9,7 @@
       </view>
       <view class="search-bar-inner">
         <input class="search-input" placeholder="搜索商品，查找大额优惠券" placeholder-class="placeholder" value="{{searchKeyword}}" bindinput="onSearchInput" bindconfirm="doSearch" confirm-type="search" />
+        <view class="icon-clear" wx:if="{{searchKeyword.length > 0}}" bindtap="onClear" style="margin-right: 12rpx;"></view>
         <view class="icon-search search-icon" bindtap="doSearch"></view>
       </view>
     </view>

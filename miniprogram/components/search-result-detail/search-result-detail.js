@@ -24,7 +24,7 @@ Component({
       wx.setClipboardData({
         data: this.data.product.platform === '淘宝' ? '￥口令示例￥' : 'https://jd.com/...',
         success: () => {
-          wx.showToast({ title: '口令/链接已复制，请打开对应APP' });
+          wx.showToast({ title: '产品信息已复制' });
         }
       });
     }

@@ -6,7 +6,7 @@ Component({
     },
     placeholder: {
       type: String,
-      value: '粘贴宝贝标题/链接/淘口令，拿隐藏券'
+      value: '粘贴宝贝标题/链接，拿隐藏券'
     },
     value: {
       type: String,

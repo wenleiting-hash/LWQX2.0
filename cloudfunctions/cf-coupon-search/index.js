@@ -12,7 +12,8 @@ const db = cloud.database()
 const _configCache = {};
 const CACHE_TTL = 5 * 60 * 1000; // 5分钟
 
-async function getCachedConfig(docId) {
+async function getCachedConfig(docId)
+{
   const now = Date.now();
   if (_configCache[docId] && (now - _configCache[docId].time) < CACHE_TTL) {
     return _configCache[docId].data;
@@ -26,13 +27,15 @@ async function getCachedConfig(docId) {
 const { mapToItem } = require('./mapToItem');
 
 // 脱敏昵称抽取
-function maskNickname(pool) {
+function maskNickname(pool)
+{
   if (!pool || pool.length === 0) return '省钱达人'
   const randomIndex = Math.floor(Math.random() * pool.length)
   return pool[randomIndex]
 }
 
-exports.main = async (event, context) => {
+exports.main = async (event, context) =>
+{
   const { query, query_type, platform = 'auto', page = 1, page_size = 20, sort, order } = event
 
   if (!query) return { code: -4, message: '搜索内容不能为空' }
@@ -41,7 +44,7 @@ exports.main = async (event, context) => {
     // 使用缓存读取配置
     const configDoc = platform === 'jd' ? 'jd_config' : 'taobao_config';
     const config = await getCachedConfig(configDoc);
-    
+
     // 如果是京东则需要 zjk_appkey，如果是淘宝则需要 zt_appkey
     let APP_KEY = '';
     if (platform === 'jd') {
@@ -49,7 +52,7 @@ exports.main = async (event, context) => {
     } else {
       APP_KEY = config.ztk_appkey || config.zhetaokeAppKey || config.ZHETAOKE_APP_KEY;
     }
-    
+
     const PID = config.taobaoPid || config.taobao_pid || config.TAOBAO_PID; // 兼容旧写法
     const SID = config.sid || config.ztk_sid || config.zhetaokeSid || config.ZHETAOKE_SID || '';
     const RELATION_ID = config.relation_id || config.taobao_channel_id || config.taobaoChannelId || config.taobao_relation_id || '';
@@ -65,42 +68,36 @@ exports.main = async (event, context) => {
     const wxContext = cloud.getWXContext()
     const openid = wxContext.OPENID || event.userInfo?.openId || ''
 
-    if (query_type === 'keyword') {
-      // 关键词搜索 API
-      let apiUrl = 'https://api.zhetaoke.com:10003/api/api_quanwang.ashx'
-      if (platform === 'jd') {
-        apiUrl = 'http://api.zhetaoke.com:20000/api/api_quanwang.ashx'
-      }
+    if (platform === 'jd') {
+      // 京东原有逻辑保持不变
+      if (query_type === 'keyword') {
+        let apiUrl = 'http://api.zhetaoke.com:20000/api/api_quanwang.ashx'
+        let sortParam = 'new'
+        if (sort === 'price') {
+          sortParam = order === 'asc' ? 'price_asc' : 'price_desc';
+        } else if (sort === 'sales') {
+          sortParam = order === 'asc' ? 'total_sale_num_asc' : 'total_sale_num_desc';
+        }
 
-      let sortParam = 'new'
-      if (sort === 'price') {
-        sortParam = order === 'asc' ? 'price_asc' : 'price_desc';
-      } else if (sort === 'sales') {
-        sortParam = order === 'asc' ? 'total_sale_num_asc' : 'total_sale_num_desc';
-      }
-      
-      const res = await axios.get(apiUrl, {
-        params: {
-          appkey: APP_KEY,
-          q: query,
-          page: page,
-          page_size: page_size,
-          sort: sortParam
-        },
-        timeout: 5000
-      })
+        const res = await axios.get(apiUrl, {
+          params: {
+            appkey: APP_KEY,
+            q: query,
+            page: page,
+            page_size: page_size,
+            sort: sortParam
+          },
+          timeout: 5000
+        })
 
-      if (res.data && res.data.status === 200 && Array.isArray(res.data.content)) {
-        items = res.data.content.map(it => mapToItem(it, platform === 'auto' ? 'taobao' : platform))
-        total = res.data.total_results || items.length
-      }
-    } else {
-      // tkl 或 url 搜索 (直接调用转链 API 提取数据，跳过 api_quanwang)
-      if (platform === 'jd') {
-        // 京东转链API-新
+        if (res.data && res.data.status === 200 && Array.isArray(res.data.content)) {
+          items = res.data.content.map(it => mapToItem(it, 'jd'))
+          total = res.data.total_results || items.length
+        }
+      } else {
         const params = {
           appkey: APP_KEY,
-          materialId: query, // 用户粘贴的京东URL
+          materialId: query,
           positionId: config.jd_position_id || config.positionId || '',
           unionId: config.jd_union_id || config.jdUnionId || config.unionId || '',
           signurl: 5
@@ -115,11 +112,10 @@ exports.main = async (event, context) => {
 
         if (res.data && res.data.status === 200 && Array.isArray(res.data.content) && res.data.content.length > 0) {
           let it = res.data.content[0];
-          
           let size = parseFloat(it.size || it.zk_final_price || 0);
           let quanhou = parseFloat(it.quanhou_jiage || size || 0);
           let hasCoupon = size > quanhou;
-          let promptMsg = hasCoupon ? '恭喜该商品发现优惠券可复制返回原APP下单或直接打开小程序下单。' : '抱歉该商品暂无更多优惠';
+          let promptMsg = hasCoupon ? '恭喜该商品发现优惠券。' : '抱歉该商品暂无更多优惠';
 
           items = [{
             ...mapToItem(it, 'jd'),
@@ -127,154 +123,178 @@ exports.main = async (event, context) => {
             hasCoupon: hasCoupon,
             couponAmount: hasCoupon ? Number((size - quanhou).toFixed(2)) : parseFloat(it.coupon_info_money || 0),
             short_url: it.shorturl || '',
-            tkl: it.tkl || '', // 京口令
+            tkl: it.tkl || '',
             item_url: it.item_url || '',
             promptMessage: promptMsg
           }];
           total = items.length;
         }
-      } else {
-        // 淘宝：批量高佣转链API（淘口令）接口
-        const params1 = {
+      }
+    } else {
+      // 淘宝(含自动)统一处理流程
+      let isItemResolved = false;
+
+      // 第一步：优先调用批量高拥转链API open_gaoyongzhuanlian_tkl_piliang.ashx
+      try {
+        const batchParams = {
           appkey: APP_KEY,
           sid: SID,
           pid: PID,
           relation_id: RELATION_ID,
           tkl: query,
-          signurl: 5 // 获取全面数据项
+          signurl: 5
         };
-        console.log('[Taobao API Request 1]', params1);
+        console.log('[Taobao 批量高佣转链 Request]', batchParams);
+        const batchRes = await axios.get('https://api.zhetaoke.com:10001/api/open_gaoyongzhuanlian_tkl_piliang.ashx', {
+          params: batchParams,
+          timeout: 5000
+        });
+        console.log('[Taobao 批量高佣转链 Response]', batchRes.data);
 
-        let taobaoItem = null;
-        try {
-          const res1 = await axios.get('https://api.zhetaoke.com:10001/api/open_gaoyongzhuanlian_tkl_piliang.ashx', {
-            params: params1,
-            timeout: 5000
-          });
-          console.log('[Taobao API Response 1]', res1.data);
+        if (batchRes.data && batchRes.data.status === 200 && Array.isArray(batchRes.data.content) && batchRes.data.content.length > 0) {
+          let it = batchRes.data.content[0];
+          if (it && it.title) {
+            let size = parseFloat(it.size || it.zk_final_price || 0);
+            let quanhou = parseFloat(it.quanhou_jiage || size || 0);
+            let hasCoupon = size > quanhou;
+            let promptMsg = hasCoupon ? '恭喜该商品发现优惠券。' : '抱歉该商品暂无更多优惠';
 
-          if (res1.data && res1.data.status === 200) {
-            let it = Array.isArray(res1.data.content) && res1.data.content.length > 0 ? res1.data.content[0] : (res1.data.title ? res1.data : null);
-            if (it && it.title) {
-              taobaoItem = it;
+            let rawTkl = it.result_tkl || it.taokouling || '';
+            let cleanTkl = rawTkl;
+            const match = rawTkl.match(/([$￥(][a-zA-Z0-9]+[$￥)])/);
+            if (match) {
+              cleanTkl = `👉 复制本段文字打开电商App即可查看：\n${match[1]}`;
             }
-          }
-        } catch(e) {
-          console.error('[Taobao API 1 Error]', e.message);
-        }
 
-        // 如果转链失败，进入兜底逻辑
-        if (!taobaoItem) {
-          console.log('[Taobao Fallback] No valid coupon/commission found, fetching location...');
-          try {
-            // 获取跳转URL地址API接口，获取商品ID
-            const params2 = {
-              appkey: APP_KEY,
-              sid: SID,
-              content: query,
-              type: 1,
-              pid: PID,
-              relation_id: RELATION_ID
-            };
-            const res2 = await axios.get('https://api.zhetaoke.com:10001/api/open_get_location.ashx', {
-              params: params2,
-              timeout: 5000
-            });
-            console.log('[Taobao API Response 2]', res2.data);
-
-            let itemId = res2.data && res2.data.item_id ? res2.data.item_id : '';
-            // 如果未直接返回 item_id，尝试从 content 包含的链接中正则提取
-            if (!itemId && res2.data && res2.data.content) {
-              const idMatch = res2.data.content.match(/[?&](?:id|itemId)=(\d+)/);
-              if (idMatch) itemId = idMatch[1];
-            }
-            console.log('[Taobao Fallback] Extracted Item ID:', itemId);
-
-            if (itemId) {
-              // 批量高佣转链API(商品ID)
-              const params3 = {
-                appkey: APP_KEY,
-                sid: SID,
-                pid: PID,
-                relation_id: RELATION_ID,
-                num_iid: itemId,
-                signurl: 5
-              };
-              console.log('[Taobao API Request 3]', params3);
-              const res3 = await axios.get('https://api.zhetaoke.com:10001/api/open_gaoyongzhuanlian.ashx', {
-                params: params3,
-                timeout: 5000
-              });
-              console.log('[Taobao API Response 3]', res3.data);
-
-              if (res3.data && res3.data.status === 200) {
-                let it = Array.isArray(res3.data.content) && res3.data.content.length > 0 ? res3.data.content[0] : (res3.data.title ? res3.data : null);
-                if (it && it.title) {
-                  taobaoItem = it;
-                  console.log('[Taobao Fallback] Successfully obtained valid item data from API 3');
-                }
-              }
-
-              // 如果第二次转链也失败或无有效商品数据，则不再强行拼装兜底数据（避免前端出现白板弹窗导致体验差）
-              if (!taobaoItem) {
-                console.log('[Taobao Fallback] Item dropped or no commission (API 3 failed). Aborting to prevent whiteboard modal.');
-              }
-            } else {
-              console.log('[Taobao Fallback] Failed to extract Item ID from API 2 response.');
-            }
-          } catch(e) {
-            console.error('[Taobao Fallback Error]', e.message);
-          }
-        }
-
-        // 整理最终淘宝返回数据
-        if (taobaoItem) {
-          let size = parseFloat(taobaoItem.size || taobaoItem.zk_final_price || 0);
-          let quanhou = parseFloat(taobaoItem.quanhou_jiage || size || 0);
-          let hasCoupon = size > quanhou;
-          let promptMsg = hasCoupon ? '恭喜该商品发现优惠券可复制返回原APP下单。' : '抱歉该商品暂无更多优惠';
-
-          let rawTkl = taobaoItem.result_tkl || taobaoItem.taokouling || '';
-          let cleanTkl = rawTkl;
-          const match = rawTkl.match(/([$￥(][a-zA-Z0-9]+[$￥)])/);
-          if (match) {
-            cleanTkl = `👉 复制本段文字打开电商App即可查看：\n${match[1]}`;
-          }
-
-          items = [{
-            ...mapToItem(taobaoItem, 'taobao'),
-            isConvert: true,
-            hasCoupon: hasCoupon,
-            couponAmount: hasCoupon ? Number((size - quanhou).toFixed(2)) : parseFloat(taobaoItem.coupon_info_money || 0),
-            tkl: cleanTkl, 
-            short_url: taobaoItem.result_url || taobaoItem.short_url || '',
-            item_url: taobaoItem.item_url || '',
-            promptMessage: promptMsg
-          }];
-          total = items.length;
-        } else {
-          // 如果全部失败，基于原始链接构造基本结构
-          let tao_id = '';
-          const idMatch = query.match(/[?&](?:id|itemId)=(\d+)/);
-          if (idMatch) tao_id = idMatch[1];
-          if (tao_id) {
             items = [{
-              tao_id: tao_id,
-              title: '淘宝商品',
-              image_url: 'https://img.alicdn.com/tfs/TB1V2eQrKSSBuNjy0FlXXbBpVXa-512-512.png',
-              original_price: 0,
-              coupon_amount: 0,
-              coupon_price: 0,
-              platform: 'taobao',
+              ...mapToItem(it, 'taobao'),
               isConvert: true,
-              hasCoupon: false,
-              tkl: '', 
-              short_url: '',
-              item_url: `https://item.taobao.com/item.htm?id=${tao_id}`,
-              promptMessage: '抱歉该商品暂无更多优惠'
+              hasCoupon: hasCoupon,
+              couponAmount: hasCoupon ? Number((size - quanhou).toFixed(2)) : parseFloat(it.coupon_info_money || 0),
+              tkl: cleanTkl,
+              short_url: it.result_url || it.short_url || '',
+              item_url: it.item_url || '',
+              promptMessage: promptMsg
             }];
             total = items.length;
+            isItemResolved = true;
           }
+        }
+      } catch (e) {
+        console.error('[Taobao 批量高佣转链 Error]', e.message);
+      }
+
+      if (!isItemResolved) {
+        // 第二步：智能解析商品 ID open_shangpin_id.ashx
+        let itemId = '';
+        try {
+          const parseParams = {
+            appkey: APP_KEY,
+            sid: SID,
+            pid: PID,
+            content: query,
+            type: 1
+          };
+          const parseRes = await axios.get('https://api.zhetaoke.com:10001/api/open_shangpin_id.ashx', {
+            params: parseParams,
+            timeout: 5000
+          });
+          console.log('[Taobao 解析商品ID]', parseRes.data);
+          if (parseRes.data && parseRes.data.status === 200 && parseRes.data.item_id) {
+            itemId = parseRes.data.item_id;
+          } else if (/^\d{9,13}$/.test(query)) {
+            itemId = query;
+          }
+        } catch (e) {
+          console.error('[Taobao 解析商品ID异常]', e.message);
+          if (/^\d{9,13}$/.test(query)) itemId = query;
+        }
+
+        // 第三步：精准查询高佣和隐藏券 open_gaoyongzhuanlian.ashx
+        if (itemId) {
+          const params3 = {
+            appkey: APP_KEY,
+            sid: SID,
+            pid: PID,
+            relation_id: RELATION_ID,
+            num_iid: itemId,
+            signurl: 5
+          };
+          console.log('[Taobao 高佣接口 Request]', params3);
+          try {
+            const res3 = await axios.get('https://api.zhetaoke.com:10001/api/open_gaoyongzhuanlian.ashx', {
+              params: params3,
+              timeout: 5000
+            });
+            console.log('[Taobao 高佣接口 Response]', res3.data);
+
+            if (res3.data && res3.data.status === 200) {
+              let it = Array.isArray(res3.data.content) && res3.data.content.length > 0 ? res3.data.content[0] : (res3.data.title ? res3.data : null);
+              if (it && it.title) {
+                let size = parseFloat(it.size || it.zk_final_price || 0);
+                let quanhou = parseFloat(it.quanhou_jiage || size || 0);
+                let hasCoupon = size > quanhou;
+                let promptMsg = hasCoupon ? '恭喜该商品发现优惠券。' : '抱歉该商品暂无更多优惠';
+
+                let rawTkl = it.result_tkl || it.taokouling || '';
+                let cleanTkl = rawTkl;
+                const match = rawTkl.match(/([$￥(][a-zA-Z0-9]+[$￥)])/);
+                if (match) {
+                  cleanTkl = `👉 复制本段文字打开电商App即可查看：\n${match[1]}`;
+                }
+
+                items = [{
+                  ...mapToItem(it, 'taobao'),
+                  isConvert: true,
+                  hasCoupon: hasCoupon,
+                  couponAmount: hasCoupon ? Number((size - quanhou).toFixed(2)) : parseFloat(it.coupon_info_money || 0),
+                  tkl: cleanTkl,
+                  short_url: it.result_url || it.short_url || '',
+                  item_url: it.item_url || '',
+                  promptMessage: promptMsg
+                }];
+                total = items.length;
+                isItemResolved = true;
+              }
+            }
+          } catch (e) {
+            console.error('[Taobao 高佣接口 Error]', e.message);
+          }
+        }
+      }
+
+      // 第四步：全网模糊搜索（兜底层）
+      if (!isItemResolved) {
+        // 3、如无商品返回，调用全网搜索商品API api_quanwang.ashx (对应文档 extend_lingquan_keywords.aspx)
+        let apiUrl = 'https://api.zhetaoke.com:10003/api/api_quanwang.ashx';
+        let sortParam = 'new';
+        if (sort === 'price') {
+          sortParam = order === 'asc' ? 'price_asc' : 'price_desc';
+        } else if (sort === 'sales') {
+          sortParam = order === 'asc' ? 'total_sale_num_asc' : 'total_sale_num_desc';
+        }
+
+        console.log('[Taobao 全网搜索 Request]', { q: query, page, page_size, sort: sortParam, sid: SID, pid: PID });
+        try {
+          const res = await axios.get(apiUrl, {
+            params: {
+              appkey: APP_KEY,
+              sid: SID,
+              pid: PID,
+              q: query,
+              page: page,
+              page_size: page_size,
+              sort: sortParam
+            },
+            timeout: 5000
+          });
+
+          if (res.data && res.data.status === 200 && Array.isArray(res.data.content)) {
+            items = res.data.content.map(it => mapToItem(it, 'taobao'));
+            total = res.data.total_results || items.length;
+          }
+        } catch (e) {
+          console.error('[Taobao 全网搜索 Error]', e.message);
         }
       }
     }
@@ -282,7 +302,7 @@ exports.main = async (event, context) => {
 
     // =========== 增加查券记录逻辑 START ===========
     // openid 已在前面获取，复用即可
-    
+
     let searchLog = {
       searchTime: new Date().toISOString(),
       event_timestamp: Date.now(), // 用于按时间戳排序
@@ -306,7 +326,7 @@ exports.main = async (event, context) => {
       searchLog.originalPrice = bestItem.original_price || 0
       searchLog.finalPrice = bestItem.coupon_price || 0
       searchLog.couponAmount = bestItem.coupon_amount || 0
-      
+
       // 修复第三方接口可能返回原价等于券后价的问题
       if (searchLog.couponAmount > 0 && searchLog.originalPrice <= searchLog.finalPrice) {
         searchLog.originalPrice = Number((searchLog.finalPrice + searchLog.couponAmount).toFixed(2))
@@ -332,7 +352,7 @@ exports.main = async (event, context) => {
         // 从缓存获取运营配置的昵称池
         const opsConfig = await getCachedConfig('operations_config');
         const nicknamePool = opsConfig.nickname_pool || opsConfig.nicknamePool || ['省钱达人'];
-        
+
         // 异步写入，不阻塞返回响应
         db.collection('bulletin_logs').add({
           data: {

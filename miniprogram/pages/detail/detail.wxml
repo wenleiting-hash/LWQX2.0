@@ -90,7 +90,7 @@
     <!-- 加载失败或无数据 -->
     <view class="error-state">
       <view class="error-icon">⚠️</view>
-      <view class="error-text">商品信息获取失败</view>
+      <view class="error-text">产品信息获取失败</view>
       <button class="retry-btn" bindtap="retry">重试</button>
     </view>
   </block>
@@ -130,7 +130,7 @@
       </view>
 
       <block wx:if="{{!showCopyGuide}}">
-        <!-- 商品信息区 -->
+        <!-- 产品信息区 -->
         <view class="result-goods-info">
           <image class="result-goods-img" src="{{itemData.image_url || itemData.image || itemData.pict_url}}" mode="aspectFill"></image>
           <view class="result-goods-title line-clamp-2">{{itemData.title}}</view>
@@ -139,17 +139,17 @@
         <!-- 提示语区域 -->
         <view class="result-compliance-msg">
           <block wx:if="{{itemData.coupon_amount || itemData.coupon}}">
-            <text>恭喜，该商品查到专属隐藏优惠券，您可复制后返回原APP下单。</text>
+            <text>恭喜，该商品查到专属隐藏优惠券。</text>
           </block>
           <block wx:else>
-            <text>很遗憾，该商品暂无更多优惠，您可复制后返回原APP下单。</text>
+            <text>很遗憾，该商品暂无更多优惠。</text>
           </block>
         </view>
 
         <!-- 按钮区域 -->
         <view class="modal-btn-wrap w-full flex flex-col gap-2" style="width: 100%; display: flex; flex-direction: column; gap: 8px; margin-top: 16px;">
           <view class="modal-btn confirm-btn" bindtap="{{(itemData.platform === 'jd' || itemData.platform === 'jingdong') ? 'copyAndOpenJd' : 'copyAndOpenTaobao'}}">
-            复制返回原APP下单
+            复制产品信息
           </view>
           <view class="modal-btn ignore-btn" bindtap="closeResultModal">取消</view>
         </view>
@@ -161,7 +161,7 @@
           <icon type="success" size="64" color="#07C160"></icon>
           <view class="font-bold text-lg mt-2" style="font-weight: bold; font-size: 18px; margin-top: 8px;">复制成功！</view>
           <view class="text-gray-500 text-center leading-relaxed" style="color: #666; text-align: center; line-height: 1.6; margin-top: 16px;">
-            <text>优惠链接/口令已保存至剪贴板\n请直接打开 <text class="font-bold text-orange-500" style="font-weight: bold; color: #FF6200;">{{(itemData.platform === 'jd' || itemData.platform === 'jingdong') ? '京东' : '手机淘宝'}}</text> App\n等待几秒即可自动弹出口令</text>
+            <text>产品信息已复制\n请妥善保存使用</text>
           </view>
           <view class="modal-btn confirm-btn w-full mt-6" bindtap="closeResultModal" style="width: 100%; margin-top: 24px;">我知道了</view>
         </view>

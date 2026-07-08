@@ -1,14 +1,19 @@
 <view class="container pb-safe">
   <!-- 顶部搜索与筛选区 -->
   <view class="header-section sticky-top">
-    <!-- 搜索框 -->
-    <view class="search-box">
-      <view class="search-input-wrapper">
-        <view class="icon-search"></view>
-        <input class="search-input" value="{{keyword}}" placeholder="粘贴商品标题或链接，自动查隐藏券" bindconfirm="onSearchConfirm" bindinput="onSearchInput" />
-        <view class="icon-clear" wx:if="{{keyword.length > 0}}" bindtap="onClear"></view>
+    <!-- 搜索框 (统一样式) -->
+    <view class="search-container">
+      <view class="search-bar-wrapper">
+        <view class="search-platform-prefix" bindtap="switchSearchPlatform">
+          <text class="prefix-text">{{(platform === 'jd') ? '京券' : '淘券'}}</text>
+          <view class="prefix-arrow"></view>
+        </view>
+        <view class="search-bar-inner">
+          <input class="search-input" value="{{keyword}}" placeholder="搜索商品，查找大额优惠券" placeholder-class="placeholder" bindconfirm="onSearchConfirm" bindinput="onSearchInput" confirm-type="search" />
+          <view class="icon-clear" wx:if="{{keyword.length > 0}}" bindtap="onClear" style="margin-right: 12rpx;"></view>
+          <view class="icon-search search-icon" bindtap="onSearchBtnClick"></view>
+        </view>
       </view>
-      <view class="search-btn" bindtap="onSearchBtnClick">搜索</view>
     </view>
 
     <!-- 排序筛选栏 -->

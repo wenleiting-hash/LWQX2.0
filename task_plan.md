@@ -19,7 +19,7 @@ Refactor the coupon search logic for Taobao and JD based on precise API field de
   - Determine `hasCoupon = size > quanhou_jiage`
   - Set `couponAmount = size - quanhou_jiage` (or keep raw coupon_info_money if available)
   - Set JD specific prompt message:
-    - If hasCoupon: "恭喜该商品发现优惠券可复制返回原APP下单或直接打开小程序下单。"
+    - If hasCoupon: "恭喜该商品发现优惠券。"
     - Else: "抱歉该商品暂无更多优惠"
 
 ### [x] Phase 3: Refactor Taobao Logic
@@ -27,7 +27,7 @@ Refactor the coupon search logic for Taobao and JD based on precise API field de
   - Extract `size` and `quanhou_jiage` from `taobaoItem`
   - Determine `hasCoupon = size > quanhou_jiage`
   - Set Taobao specific prompt message:
-    - If hasCoupon: "恭喜该商品发现优惠券可复制返回原APP下单。"
+    - If hasCoupon: "恭喜该商品发现优惠券。"
     - Else: "抱歉该商品暂无更多优惠"
 
 ### [x] Phase 4: Apply Code Changes

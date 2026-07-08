@@ -71,7 +71,7 @@
 | `data.total` | number | 总结果数（用于分页） |
 
 **验收标准：**
-- Given 前端传入 `query_type=tkl` 且 query 为有效淘口令，When 云函数执行，Then 从云数据库读取最新的 AppKey → 调用 ZTK #1 批量高佣转链 API → 返回转链后的商品信息
+- Given 前端传入 `query_type=tkl` 且 query 为有效淘口令，When 云函数执行，Then 从云数据库读取最新的 AppKey → 调用 ZTK #1 批量高佣转链 API → 返回转链后的产品信息
 - Given 前端传入 `query_type=keyword` 且 query 为中文关键词，When 云函数执行，Then 调用 ZTK #2（淘宝）或 #7（京东）全网搜索 API → 返回商品列表
 - Given AppKey 无效或过期，When API 返回错误，Then 云函数返回 `{ code: -1, message: "系统维护中，请稍后重试" }`，**不暴露具体错误信息给前端**
 - Given API 响应超时（>5秒），When 等待超时，Then 云函数返回 `{ code: -1, message: "查询超时，请重试" }`

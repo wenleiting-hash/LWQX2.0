@@ -35,20 +35,26 @@ Page({
 
   onSearchConfirm(e) {
     const val = e.detail.value;
-    if (val.trim()) {
-      this.setData({ keyword: val.trim() });
-      this.fetchData(true);
-    }
+    this.setData({ keyword: val.trim() });
+    this.fetchData(true);
   },
 
   onSearchBtnClick() {
-    if (this.data.keyword.trim()) {
-      this.fetchData(true);
-    }
+    this.fetchData(true);
+  },
+
+  switchSearchPlatform() {
+    const nextPlatform = this.data.platform === 'tb' || this.data.platform === 'taobao' ? 'jd' : 'tb';
+    this.setData({ platform: nextPlatform });
+    wx.vibrateShort();
+    
+    // Auto trigger search
+    this.fetchData(true);
   },
 
   onClear() {
     this.setData({ keyword: '', productList: [], page: 1, noMoreData: false });
+    this.fetchData(true);
   },
 
   changeSort(e) {
@@ -82,16 +88,28 @@ Page({
     this.setData({ loading: true });
 
     try {
-      // In a real scenario, API.searchCoupon might take sortType and sortOrder
-      const res = await API.searchCoupon({
-        query: this.data.keyword,
-        query_type: this.data.query_type,
-        platform: this.data.platform,
-        page: this.data.page,
-        page_size: this.data.pageSize,
-        sort: this.data.sortType,
-        order: this.data.sortOrder
-      });
+      let res;
+      if (!this.data.keyword) {
+        // 如果清空搜索条件，搜索全部（使用领券大厅的信息流数据）
+        res = await API.getFeedData({
+          feed_type: 'coupon_hall',
+          platform: this.data.platform,
+          page: this.data.page,
+          page_size: this.data.pageSize,
+          sort: this.data.sortType,
+          order: this.data.sortOrder
+        });
+      } else {
+        res = await API.searchCoupon({
+          query: this.data.keyword,
+          query_type: this.data.query_type,
+          platform: this.data.platform,
+          page: this.data.page,
+          page_size: this.data.pageSize,
+          sort: this.data.sortType,
+          order: this.data.sortOrder
+        });
+      }
 
       let newList = [];
       if (res && Array.isArray(res.items)) {
